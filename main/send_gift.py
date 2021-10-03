@@ -9,6 +9,7 @@ import undetected_chromedriver.v2 as uc
 from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
 from seleniumwire import webdriver
 from selenium.webdriver.support.select import Select
+from pyvirtualdisplay import Display
 
 
 def steam_login(driver, login: str, password: str):
