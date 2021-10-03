@@ -67,7 +67,7 @@ def gift_game(driver, game_link, friend_name):
     time.sleep(3)
     try:
         select_element = driver.find_element_by_xpath('//*[@id="ageYear"]')
-        time.sleep(0.5)
+        time.sleep(2)
         Select(select_element).select_by_value('2002')
         driver.find_element_by_xpath('//*[@id="app_agegate"]/div[1]/div[3]/a[1]/span').click()
         time.sleep(1)
@@ -79,27 +79,27 @@ def gift_game(driver, game_link, friend_name):
     except NoSuchElementException:
         driver.find_element_by_xpath("//*[contains(@href,'addBundleToCart')]").click()
 
-    time.sleep(1)
+    time.sleep(4)
     # Купить в подарок
     driver.find_element_by_xpath('//*[@id="btn_purchase_gift"]/span').click()
-    time.sleep(1)
+    time.sleep(4)
     # Выбрать друга
     friends_table = driver.find_element_by_xpath('//*[@id="friends_chooser"]')
     friends = friends_table.find_elements_by_tag_name('div')
     for friend in friends:
         if friend.text == friend_name:
             friend.click()
-    time.sleep(1)
+    time.sleep(4)
     # Продолжить
     driver.find_element_by_xpath('//*[@id="gift_recipient_tab"]/div[3]/div/a/span').click()
-    time.sleep(1)
+    time.sleep(4)
     # Заполняем письмо
     driver.find_element_by_xpath('//*[@id="gift_recipient_name"]').send_keys('Your game')
-    time.sleep(0.5)
-    driver.find_element_by_xpath('//*[@id="gift_message_text"]').send_keys('....')
-    time.sleep(0.3)
-    driver.find_element_by_xpath('//*[@id="gift_signature"]').send_keys('BBB')
     time.sleep(1)
+    driver.find_element_by_xpath('//*[@id="gift_message_text"]').send_keys('....')
+    time.sleep(1)
+    driver.find_element_by_xpath('//*[@id="gift_signature"]').send_keys('BBB')
+    time.sleep(3)
     driver.find_element_by_xpath('//*[@id="submit_gift_note_btn"]/span').click()
 
     time.sleep(3)
