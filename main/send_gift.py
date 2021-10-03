@@ -109,7 +109,7 @@ def gift_game(driver, game_link, friend_name):
 
 
 def main(login, password, target_name, game_link, proxy):
-    display = Display(visible=0, size=(1920, 1080))
+    display = Display(size=(1920, 1080))
     display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
     chromedriver_autoinstaller.install()
@@ -132,7 +132,7 @@ def main(login, password, target_name, game_link, proxy):
 
 
 def main_friend_add(login: str, password: str, proxy: str, target_link: str):
-    display = Display(visible=0, size=(1920, 1080))
+    display = Display(size=(1920, 1080))
     display.start()
 
     print('!!!!!!!!!!!!!!!!!!!!')
