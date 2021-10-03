@@ -20,7 +20,7 @@ def get_shops() -> Shop:
     return Shop.objects.all()
 
 
-def send_message(message: str, token: str, users: list[TelegramAccount]):
+def send_message(message: str, token: str, users):
     bot = telebot.TeleBot(token, parse_mode=None)
     for i in users:
         print(f"{i.user_id} - send")
