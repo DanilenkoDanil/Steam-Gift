@@ -14,7 +14,7 @@ from pyvirtualdisplay import Display
 
 def steam_login(driver, login: str, password: str):
     driver.get('http://steamcommunity.com/login/home/?goto=')
-    time.sleep(2)
+    time.sleep(10)
     login_input = driver.find_element_by_xpath('//*[@id="input_username"]')
     for i in login:
         login_input.send_keys(i)
