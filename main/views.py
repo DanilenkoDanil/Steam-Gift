@@ -55,7 +55,7 @@ def send_gift_to_user(login, order_code, task_name):
     target_name = get_name.get_name(order.user_link)
     game_link = f'https://store.steampowered.com/app/{order.game.app_code}'
     try:
-        send_gift.main(bot.steam_login, bot.steam_password, target_name, game_link)
+        send_gift.main(bot.steam_login, bot.steam_password, target_name, game_link, bot.proxy)
         order.status = 'Gift sent'
         order.save()
     except Exception as e:
