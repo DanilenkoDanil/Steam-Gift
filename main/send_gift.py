@@ -107,11 +107,19 @@ def gift_game(driver, game_link, friend_name):
     driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
 
 
-# Интегрировать прокси!
-def main(login, password, target_name, game_link):
+def main(login, password, target_name, game_link, proxy):
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
     chromedriver_autoinstaller.install()
-    driver = uc.Chrome()
+    options = {
+        'proxy': {
+            'http': f'http://{proxy}',
+            'https': f'https://{proxy}',
+            'no_proxy': 'localhost,127.0.0.1'  # excludes
+        }
+    }
+    driver = webdriver.Chrome(seleniumwire_options=options)
 
     steam_login(driver, login, password)
     time.sleep(3)
@@ -119,14 +127,24 @@ def main(login, password, target_name, game_link):
     gift_game(driver, game_link, target_name)
 
     driver.quit()
+    display.stop()
 
 
-# Интегрировать прокси!
 def main_friend_add(login: str, password: str, proxy: str, target_link: str):
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
+
     print('!!!!!!!!!!!!!!!!!!!!')
     chromedriver_autoinstaller.install()
     print(proxy)
-    driver = uc.Chrome()
+    options = {
+        'proxy': {
+            'http': f'http://{proxy}',
+            'https': f'https://{proxy}',
+            'no_proxy': 'localhost,127.0.0.1'  # excludes
+        }
+    }
+    driver = webdriver.Chrome(seleniumwire_options=options)
 
     steam_login(driver, login, password)
     time.sleep(3)
@@ -134,5 +152,6 @@ def main_friend_add(login: str, password: str, proxy: str, target_link: str):
     add_friend(driver, target_link)
 
     driver.quit()
+    display.stop()
 
 # main()
