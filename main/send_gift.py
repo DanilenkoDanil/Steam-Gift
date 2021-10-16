@@ -111,6 +111,51 @@ def gift_game(driver, game_link, friend_name):
     driver.find_element_by_xpath('//*[@id="accept_ssa"]').click()
     driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
 
+    
+def check_gift_status(login: str, password: str, proxy: str, nickname: str, game_name: str):
+    display = Display(size=(1920, 1080))
+    display.start()
+
+    print('!!!!!!!!!!!!!!!!!!!!')
+    print(proxy)
+    options = {
+        'proxy': {
+            'http': f'http://{proxy}',
+            'https': f'https://{proxy}',
+            'no_proxy': 'localhost,127.0.0.1'  # excludes
+        }
+    }
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
+
+    steam_login(driver, login, password)
+    time.sleep(3)
+
+    steam_id = driver.current_url.split('id/')[1]
+    driver.get(f'https://steamcommunity.com/id/{steam_id}/inventory/')
+    time.sleep(6)
+    driver.find_element_by_xpath('//*[@id="inventory_more_link"]').click()
+    time.sleep(4)
+    driver.find_element_by_xpath('//*[@id="inventory_more_dropdown"]/div/a[3]').click()
+    time.sleep(6)
+    gifts = driver.find_element_by_xpath('//*[@id="tabcontent_pendinggifts"]').find_elements_by_tag_name('div')
+    for i in gifts:
+        try:
+            status_area = i.find_element_by_class_name('gift_status_area')
+        except NoSuchElementException:
+            continue
+        print(status_area.text)
+        if nickname in status_area.find_element_by_tag_name('a').text and game_name in i.text:
+            if 'Получен' in i.text:
+                driver.quit()
+                # display.stop()
+                return 'Received'
+            elif 'Отправлен' in i.text:
+                driver.quit()
+                # display.stop()
+                return 'Submitted'
+    driver.quit()
+    display.stop()
+    return 'Rejected'
 
 def main(login, password, target_name, game_link, proxy):
     display = Display(size=(1920, 1080))
@@ -124,7 +169,7 @@ def main(login, password, target_name, game_link, proxy):
             'no_proxy': 'localhost,127.0.0.1'  # excludes
         }
     }
-    driver = webdriver.Chrome(seleniumwire_options=options)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
 
     steam_login(driver, login, password)
     time.sleep(3)
@@ -149,7 +194,7 @@ def main_friend_add(login: str, password: str, proxy: str, target_link: str):
             'no_proxy': 'localhost,127.0.0.1'  # excludes
         }
     }
-    driver = webdriver.Chrome(seleniumwire_options=options)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
 
     steam_login(driver, login, password)
     time.sleep(3)
