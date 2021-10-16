@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.views import View
 from background_task import background
 
-from main.models import Account, Game, Shop, Order, TelegramAccount, TelegramBot
+from main.models import Account, Game, Shop, Order, TelegramAccount, TelegramBot, Handmade, Status
 
 from . import get_name
 from . import get_friends
@@ -20,8 +20,8 @@ def get_shops() -> Shop:
     return Shop.objects.all()
 
 
-def send_message(message: str, token: str, users):
-    bot = telebot.TeleBot(token)
+def send_message(message, token, users):
+    bot = telebot.TeleBot(token, parse_mode=None)
     for i in users:
         print(f"{i.user_id} - send")
         try:
@@ -37,15 +37,38 @@ def add_friend(login, target_link, order_id, task_name):
     order = get_order_by_sell_code(order_id)
     bot = get_user_by_login(login)
     try:
-        # send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.proxy, target_link)
-        order.status = 'Accept the friend request from the bot'
+        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.proxy, target_link)
+        order.status = 'Accept Request'
         order.save()
         check_friends_list(login, order_id, bot.link, target_link, 'Check friends')
     except Exception as e:
         print(e)
-        order.status = 'Add Friend Error!!!'
+        order.status = 'Add Friend Error'
         order.save()
 
+
+@background
+def check_gift_status(login, target_name, order_id, task_name):
+    print(task_name)
+    order = get_order_by_sell_code(order_id)
+    bot = get_user_by_login(login)
+    game_name = order.game.name
+    try:
+        status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.proxy, target_name, game_name)
+        if status == 'Submitted':
+            order.status = 'Gift Sent'
+            order.save()
+            check_gift_status(login, target_link, order_id, task_name, schedule=600)
+        elif status == 'Received':
+            order.status = 'Gift Received'
+            order.save()
+        elif status == 'Rejected':
+            order.status = 'Gift Rejected'
+            order.save()
+    except Exception as e:
+        print(e)
+        order.status = 'Check Error'
+        order.save()
 
 @background
 def send_gift_to_user(login, order_code, task_name):
@@ -56,27 +79,31 @@ def send_gift_to_user(login, order_code, task_name):
     game_link = f'https://store.steampowered.com/app/{order.game.app_code}'
     try:
         send_gift.main(bot.steam_login, bot.steam_password, target_name, game_link, bot.proxy)
-        order.status = 'Gift sent'
+        order.status = 'Gift Sent'
         order.save()
+        check_gift_status(login, target_name, order_code, 'Check Gift Status', schedule=120)
     except Exception as e:
         print(e)
-        order.status = 'Send Gift Error!!!'
+        order.status = 'Send Gift Error'
         order.save()
 
 
 # 5 СЕКУНД!
-@background(schedule=5)
+@background(schedule=30)
 def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
     print(task_name)
     print('!!!!!!!!!!!!!!!!!!!!!1111111111111111111111111111')
     print(order_code)
     print(bot_link)
     print(user_link)
+    order = get_order_by_sell_code(order_code)
     print('!!!!!!!!!!!!!!!!!!!!!')
     try:
         result = get_friends.check_friends(bot_link, user_link)
         if result:
             print("Бот в друзьях")
+            order.status = 'Sending Gift'
+            order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
             check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
@@ -128,6 +155,10 @@ def get_game(product_code: str) -> Game:
     return Game.objects.filter(sell_code=product_code)[0]
 
 
+def get_status(status_type: str, lang: str):
+    return Status.objects.filter(status_type=status_type, lang=lang)[0]
+
+
 def get_order(key: str):
     try:
         return Order.objects.filter(sell_code=key)[0]
@@ -135,13 +166,40 @@ def get_order(key: str):
         return False
 
 
+def get_handmade(key: str):
+    try:
+        return Handmade.objects.filter(code=key)[0]
+    except IndexError:
+        return False
+
+
 def index(request):
+
     code = request.GET.get('uniquecode')
     order = get_order(code)
     if order is False:
         for i in get_shops():
             info = api.check_code(code, i.guid, i.seller_id)
             if info['retval'] == 0:
+
+                add_to_friends_ru = get_status('Add to Friends', 'ru')
+                add_to_friends_en = get_status('Add to Friends', 'eng')
+                sending_gift_ru = get_status('Sending Gift', 'ru')
+                sending_gift_en = get_status('Sending Gift', 'eng')
+                check_error_ru = get_status('Check Error', 'ru')
+                check_error_en = get_status('Check Error', 'eng')
+                send_gift_error_ru = get_status('Send Gift Error', 'ru')
+                send_gift_error_en = get_status('Send Gift Error', 'eng')
+                add_friend_error_en = get_status('Add Friend Error', 'eng')
+                add_friend_error_ru = get_status('Add Friend Error', 'ru')
+                gift_rejected_en = get_status('Gift Rejected', 'eng')
+                gift_rejected_ru = get_status('Gift Rejected', 'ru')
+                gift_received_en = get_status('Gift Received', 'eng')
+                gift_received_ru = get_status('Gift Received', 'ru')
+                gift_sent_en = get_status('Gift Sent', 'eng')
+                gift_sent_ru = get_status('Gift Sent', 'ru')
+                accept_request_ru = get_status('Accept Request', 'ru')
+                accept_request_en = get_status('Accept Request', 'eng')
 
                 game = get_game(info['id_goods'])
                 game_code = game.app_code
@@ -161,7 +219,8 @@ def index(request):
 
                 user_link = info['options'][0]['value']
 
-                order = Order(sell_code=code, bot=account, game=game, user_link=user_link, status='', country=country)
+                order = Order(sell_code=code, bot=account, game=game, user_link=user_link, status='Add to Friends',
+                              country=country, skype_link=i.skype_link, shop_link=i.shop_link)
                 order.save()
 
                 add_friend(account.steam_login, user_link, code, 'Add to Friends')
@@ -183,6 +242,26 @@ def index(request):
                                'user_link': user_link,
                                'bot_link': account.link,
                                'region': country,
+                               'shop_link': order.shop_link,
+                               'skype_link': order.skype_link,
+                               'accept_request_ru': accept_request_ru.text,
+                               'accept_request_en': accept_request_en.text,
+                               'add_to_friends_ru': add_to_friends_ru.text,
+                               'add_to_friends_en': add_to_friends_en.text,
+                               'sending_gift_ru': sending_gift_ru.text,
+                               'sending_gift_en': sending_gift_en.text,
+                               'send_gift_error_ru': send_gift_error_ru.text,
+                               'send_gift_error_en': send_gift_error_en.text,
+                               'check_error_ru': check_error_ru.text,
+                               'check_error_en': check_error_en.text,
+                               'add_friend_error_ru': add_friend_error_ru.text,
+                               'add_friend_error_en': add_friend_error_en.text,
+                               'gift_rejected_en': gift_rejected_en.text,
+                               'gift_rejected_ru': gift_rejected_ru.text,
+                               'gift_received_en': gift_received_en.text,
+                               'gift_received_ru': gift_received_ru.text,
+                               'gift_sent_en': gift_sent_en.text,
+                               'gift_sent_ru': gift_sent_ru.text,
                                })
             else:
                 continue
@@ -190,6 +269,25 @@ def index(request):
         html = f"Код {code} не действителен!"
         return HttpResponse(html)
     else:
+
+        add_to_friends_ru = get_status('Add to Friends', 'ru')
+        add_to_friends_en = get_status('Add to Friends', 'eng')
+        sending_gift_ru = get_status('Sending Gift', 'ru')
+        sending_gift_en = get_status('Sending Gift', 'eng')
+        check_error_ru = get_status('Check Error', 'ru')
+        check_error_en = get_status('Check Error', 'eng')
+        send_gift_error_ru = get_status('Send Gift Error', 'ru')
+        send_gift_error_en = get_status('Send Gift Error', 'eng')
+        add_friend_error_en = get_status('Add Friend Error', 'eng')
+        add_friend_error_ru = get_status('Add Friend Error', 'ru')
+        gift_rejected_en = get_status('Gift Rejected', 'eng')
+        gift_rejected_ru = get_status('Gift Rejected', 'ru')
+        gift_received_en = get_status('Gift Received', 'eng')
+        gift_received_ru = get_status('Gift Received', 'ru')
+        gift_sent_en = get_status('Gift Sent', 'eng')
+        gift_sent_ru = get_status('Gift Sent', 'ru')
+        accept_request_ru = get_status('Accept Request', 'ru')
+        accept_request_en = get_status('Accept Request', 'eng')
 
         game_code = order.game.app_code
         image_link = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{game_code}/header.jpg"
@@ -203,7 +301,43 @@ def index(request):
                        'user_link': order.user_link,
                        'bot_link': order.bot.link,
                        'region': order.country,
+                       'shop_link': order.shop_link,
+                       'skype_link': order.skype_link,
+                       'accept_request_ru': accept_request_ru.text,
+                       'accept_request_en': accept_request_en.text,
+                       'add_to_friends_ru': add_to_friends_ru.text,
+                       'add_to_friends_en': add_to_friends_en.text,
+                       'sending_gift_ru': sending_gift_ru.text,
+                       'sending_gift_en': sending_gift_en.text,
+                       'send_gift_error_ru': send_gift_error_ru.text,
+                       'send_gift_error_en': send_gift_error_en.text,
+                       'check_error_ru': check_error_ru.text,
+                       'check_error_en': check_error_en.text,
+                       'add_friend_error_ru': add_friend_error_ru.text,
+                       'add_friend_error_en': add_friend_error_en.text,
+                       'gift_rejected_en': gift_rejected_en.text,
+                       'gift_rejected_ru': gift_rejected_ru.text,
+                       'gift_received_en': gift_received_en.text,
+                       'gift_received_ru': gift_received_ru.text,
+                       'gift_sent_en': gift_sent_en.text,
+                       'gift_sent_ru': gift_sent_ru.text,
                        })
+
+
+def handmade(request):
+    code = request.GET.get('uniquecode')
+
+    for i in get_shops():
+        info = api.check_code(code, i.guid, i.seller_id)
+        if info['retval'] == 0:
+            handmade = get_handmade(info['id_goods'])
+            if handmade is not False:
+                return render(request, 'main/handmade.html',
+                              {'code': code,
+                               'title': handmade.title,
+                               'text': handmade.text,
+                               })
+
 
 
 def head(request):
