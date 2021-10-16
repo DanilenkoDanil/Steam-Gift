@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	{% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <title>Document</title>
+
+</head>
+<body>
+
+    <section class="main container">
+
+            <div class="main__text">
+                <h1 class="main__title">{{ title }}</h1>
+                    <p class="rus_lang">{{ text|linebreaksbr }}</p>
+
+
+                 <div class="main__social">
+                     <p class="rus_lang">Уникальный код товара: {{ code }}</p>
+                    <h2 class="main__social-title rus_lang">Контактные данные продавца</h2>
+                    <h2 class="main__social-title en_lang">Seller contact details</h2>
+
+                    <div class="main__social-wrapper">
+                        <a class="main__social_link" href="{{skype_link}}" target="_blank">
+                            <img src="{% static 'img/premium-icon-skype-3128338.png' %}" alt="">
+                            <p>Open</p>
+                        </a>
+                        <a class="main__social_link" href="{{shop_link}}" target="_blank">
+                            <img src="{% static 'img/free-icon-pay-per-click-637922.png' %}" alt="">
+                            <p>Open</p>
+                        </a>
+                    </div>
+                </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

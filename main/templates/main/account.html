@@ -1,279 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>SteamBot</title>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-		<style type="text/css">
-			*,
-			*::before,
-			*::after {
-				box-sizing: border-box;
-			}
+<head>
+	{% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <title>Document</title>
 
-			body {
-				padding: 0;
-				margin: 0;
-				font-family: system-ui, -apple-system, "Segoe UI", Roboto,
-					"Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif,
-					"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-					"Noto Color Emoji";
-				height: 100vh;
-				position: relative;
-			}
+</head>
+<body>
 
-			h1,
-			h2,
-			h3,
-			h4,
-			h5,
-			h6 {
-				margin: 0;
-			}
+    <section class="main container">
+        <div class="language">
+            <button onclick="functionRu()" class="language__item active" id="ru_button">RU</button>
+            <button onclick="functionEn()" class="language__item" id="en_button">EN</button>
+            <script>
+                function functionEn(){
+                var rusLang = document.getElementsByClassName("rus_lang");
+                var enLang = document.getElementsByClassName("en_lang");
+                for (i = 0; i < enLang.length; i++) {
+                  enLang[i].style.position = "static";
+                  rusLang[i].style.position = "absolute";
+                  rusLang[i].style.top = "-9999px";
+                  rusLang[i].style.left = "-9999px";
+                  document.getElementById("en_button").classList.add('active');
+                  document.getElementById("ru_button").classList.remove('active')
+                }
+              }
+                 function functionRu(){
+                  var rusLang = document.getElementsByClassName("rus_lang");
+                  var enLang = document.getElementsByClassName("en_lang");
+                  for (i = 0; i < enLang.length; i++) {
+                    rusLang[i].style.position = "static";
+                    enLang[i].style.position = "absolute";
+                    enLang[i].style.top = "-9999px";
+                    enLang[i].style.left = "-9999px";
+                    document.getElementById("ru_button").classList.add('active');
+                    document.getElementById("en_button").classList.remove('active')
+          }
+      }
 
-			.container {
-				max-width: 1630px;
-				padding: 0 15px;
-				margin: 0 auto;
-			}
 
-			.header {
-				border-bottom: 1px solid #dee2e6;
-				margin-bottom: 40px;
-			}
+            </script>
+        </div>
+        <div class="main__item">
+            <div class="main__img">
+                <img src="{{ image_link }}" alt="{{ game_name }}">
+            </div>
 
-			.header__content {
-				padding: 17px 0;
-			}
+            <div class="main__text">
+                <h1 class="main__title">{{ game_name }}</h1>
+                <p class="main__subtitle rus_lang">Это FAQ для пользователей, изучите его прежде чем обращаться в поддержку, если у вас возникли проблеммы:</p>
+                <p class="main__subtitle en_lang">This is a user FAQ, please check it before contacting support if you have any problems:</p>
+                <ul class="main__list">
+                    <li class="rus_lang">Пункт первый</li>
+                    <li class="rus_lang">Пункт второй</li>
+                    <li class="rus_lang">Пункт третий</li>
+                    <li class="en_lang">Point first</li>
+                    <li class="en_lang">Point second</li>
+                    <li class="en_lang">Point third</li>
+                </ul>
+                <p class="rus_lang">Спасибо за внимание!</p>
+                <p class="en_lang">Thank you for the attention!</p>
 
-			.header__title {
-				font-size: 25px;
-				font-weight: 400;
-			}
+                <div class="main__text_bot">
+                    <p class="rus_lang">Регион аккаунта: {{ region }}</p>
+                    <p class="en_lang"> Account region: {{ region }}</p>
+                    <p class="rus_lang">Steam профиль: <a href="{{ user_link }}" target="_blank">Ссылка</a></p>
+                    <p class="en_lang">Steam profile: <a href="{{ user_link }}" target="_blank">Link</a></p>
+                    <p class="rus_lang">Уникальный код товара: {{ code }}</p>
+                    <p class="en_lang">Unique product code: {{ code }}</p>
+                </div>
 
-			.main {
-				display: flex;
-				justify-content: center;
-				padding: 0 5px;
-			}
+                <div class="main__status">
+                    <span><strong>Подарок успешно отправлен на ваш аккаунт</strong></span>
+                </div>
 
-			.product {
-				background-image: #fff;
-				border-radius: 10px;
-				overflow: hidden;
-				border: 1px solid #dedede;
-			}
+                <div class="main__social">
+                    <h2 class="main__social-title rus_lang">Контактные данные продавца</h2>
+                    <h2 class="main__social-title en_lang">Seller contact details</h2>
 
-			.product__img {
-				max-width: 100%;
-				height: auto;
-				object-fit: cover;
-			}
+                    <div class="main__social-wrapper">
+                        <a class="main__social_link" href="{{skype_link}}" target="_blank">
+                            <img src="{% static 'img/premium-icon-skype-3128338.png' %}" alt="">
+                            <p>Open</p>
+                        </a>
+                        <a class="main__social_link" href="{{shop_link}}" target="_blank">
+                            <img src="{% static 'img/free-icon-pay-per-click-637922.png' %}" alt="">
+                            <p>Open</p>
+                        </a>
+                    </div>
 
-			div.code{
-				text-align: center;
-			}
+                </div>
+            </div>
+        </div>
+     <script>
 
-			.product__info {
-				padding: 10px 15px;
-				border-bottom: 1px solid #dedede;
-			}
+let data = {
+	sell_code: "{{ code }}"
+}
 
-			.product__info:last-child {
-				border: none;
-				padding: 15px 15px;
-			}
+function sleep(time) {
+	return new Promise((resolve) => setTimeout(resolve, time));
+}
 
-			.product__row span {
-				color: inherit;
-				font-weight: 400;
-				font-size: 17px;
-			}
-
-			.product__bold {
-				font-weight: 700 !important;
-			}
-
-			.product__copy {
-				text-decoration: underline;
-				cursor: pointer;
-			}
-
-			.product__btn {
-				width: 100%;
-				border-radius: 10px;
-				border: 1px solid #dedede;
-				background-color: transparent;
-				cursor: pointer;
-				padding: 10px 15px;
-				transition: all 0.3s linear;
-			}
-
-			.product__btn:hover {
-				border: 1px solid #000;
-				background-color: #000;
-				color: #fff;
-			}
-
-			.copy__alert {
-				background-color: #198754;
-				width: 200px;
-				border-radius: 0 0 10px 10px;
-				color: #fff;
-				text-align: center;
-				padding: 10px 0;
-				font-weight: 700;
-
-				position: absolute;
-				top: 0;
-				left: 50%;
-				transform: translate(-50%, -100%);
-				transition: all 0.2s linear;
-			}
-
-			.copy__alert.show {
-				transform: translate(-50%, 0);
-			}
-
-			@media (max-width: 480px) {
-				.product__row span {
-					font-size: 15px;
-				}
-				.product__info {
-					padding: 10px 0 10px 5px;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<header class="header">
-			<div class="container">
-				<div class="header__content">
-					<h1 class="header__title">SteamBot</h1>
-				</div>
-			</div>
-		</header>
-		<main class="main">
-			<div class="product">
-				<img
-					class="product__img"
-					src="{{ image_link }}"
-					alt=""
-				/>
-				<div class="product__info">
-					<div class="product__row">
-						<span class="product__bold">Product Name :</span> &nbsp;
-						<a class="product__link" href="{{ game_link }}" target="_blank">
-							<span class="product__name-game" translate="no"
-								>{{ game_name }}</span
-							>
-						</a>
-					</div>
-					<div class="product__row">
-						<span class="product__bold" translate="no"
-							>Unique Product Code :</span
-						>
-						&nbsp;<span>{{ code }}</span>
-					</div>
-					<div class="product__row">
-						<span class="product__bold">Bot Link :</span> &nbsp;
-						<a class="product__link" href="{{ bot_link }}" target="_blank">
-							<span class="product__name-game" translate="no"
-								>Перейти</span
-							>
-						</a>
-					</div>
-					<div class="product__row">
-						<span class="product__bold">User Link :</span> &nbsp;
-						<a class="product__link" href="{{ user_link }}" target="_blank">
-							<span class="product__name-game" translate="no"
-								>Перейти</span
-							>
-						</a>
-					</div>
-					<div class="product__row">
-						<span class="product__bold">Region :</span> &nbsp;
-						<a class="product__link" target="_blank">
-							<span class="product__name-game" translate="no"
-								>{{ region }}</span
-							>
-						</a>
-					</div>
-				</div>
-				<div class="product__info">
-					<div class="product__row">
-						<span class="product__bold">Status :</span> &nbsp;
-						<span class="product__copy status" id="copy" translate="no"
-							><div class="spinner-grow" role="status">
-  							<span class="sr-only">Loading...</span>
-							</div></span>
-						<script>
-
-							let data = {
-									sell_code: "{{ code }}"
-								}
-
-							function sleep (time) {
-							  return new Promise((resolve) => setTimeout(resolve, time));
-							}
-
-							function getAccount() {
-								$.ajax({
-										method: "GET",
-										dataType: "json",
-										data: data,
-										url: {% url "load_status" %},
-										success: function(data){
-											console.log(data["data"]["status"]);
-											status = data["data"]["status"];
-											if (status != null) {
-												$('.status').html(status);
-												sleep(50000).then(() => {
-													getAccount()
-												});
-											} else {
-												sleep(50000).then(() => {
-													getAccount()
-												});
-											}
-
-										}
-								})
-							}
+function getAccount() {
+	$.ajax({
+			method: "GET",
+			dataType: "json",
+			data: data,
+			url: {% url "load_status" %},
+			success: function(data) {
+				console.log(data["data"]["status"]);
+				status = data["data"]["status"];
+				if (status !== null) {
+					if (status == 'Accept Request') {
+						$('.main__status').html(
+							"<span class='rus_lang'><strong>{{ accept_request_ru }}</strong></span><span class='en_lang'><strong>{{ accept_request_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
 							getAccount()
+						});
+					} else if (status == 'Gift Sent') {
+						$('.main__status').html(
+							"<span class='rus_lang'><strong>{{ gift_sent_ru }}</strong></span><span class='en_lang'><strong>{{ gift_sent_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
+							getAccount()
+						});
+					} else if (status == 'Gift Received') {
+						$('.main__status').html(
+							"<span class='rus_lang'><strong>{{ gift_received_ru }}</strong></span><span class='en_lang'><strong>{{ gift_received_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
+							getAccount()
+						});
+					} else if (status == 'Gift Rejected') {
+						$('.main__status').html(
+						    "<span class='rus_lang'><strong>{{ gift_rejected_ru }}</strong></span><span class='en_lang'><strong>{{ gift_rejected_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
+							getAccount()
+						});
+					} else if (status == 'Add Friend Error') {
+						$('.main__status').html(
+						    "<span class='rus_lang'><strong>{{ add_friend_error_ru }}</strong></span><span class='en_lang'><strong>{{ add_friend_error_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
+							getAccount()
+						});
+					} else if (status == 'Send Gift Error') {
+						$('.main__status').html(
+						    "<span class='rus_lang'><strong>{{ send_gift_error_ru }}</strong></span><span class='en_lang'><strong>{{ send_gift_error_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
+							getAccount()
+						});
+					} else if (status == 'Check Error') {
+						$('.main__status').html(
+						    "<span class='rus_lang'><strong>{{ check_error_ru }}</strong></span><span class='en_lang'><strong>{{ check_error_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
+							getAccount()
+						});
+					} else if (status == 'Sending Gift') {
+						$('.main__status').html(
+						    "<span class='rus_lang'><strong>{{ sending_gift_ru }}</strong></span><span class='en_lang'><strong>{{ sending_gift_en }}</strong></span>"
+						);
+						sleep(10000).then(() => {
+							getAccount()
+						});
+                    } else if (status == 'Add to Friends') {
+						$('.main__status').html(
+						    "<span class='rus_lang'><strong>{{ add_to_friends_ru }}</strong></span><span class='en_lang'><strong>{{ add_to_friends_en }}</strong></span>"
 
-						</script>
-					</div>
+						);
 
-				</div>
+                        sleep(10000).then(() => {
+							getAccount()
+						});
 
-			</div>
-		</main>
-		<div class="copy__alert">
-			<p class="copy__alert-text">Текст скопирован</p>
-		</div>
-		<script>
-			const copyText = document.querySelectorAll("#copy");
-			const copyAlert = document.querySelector(".copy__alert");
+					} else {
+						sleep(10000).then(() => {
+							getAccount()
+						});
+					}
 
-			copyText.forEach(item => {
-				item.addEventListener("click", () => {
-					const textArea = document.createElement("textarea");
-					textArea.value = item.textContent;
-					document.body.appendChild(textArea);
-					textArea.select();
-					document.execCommand("Copy");
-					textArea.remove();
+				}
+			}
+	})}
+	getAccount()
 
-					copyAlert.classList.add("show");
-					setTimeout(() => {
-						copyAlert.classList.remove("show");
-					}, 2000);
-				});
-			});
-		</script>
-	</body>
+	</script>
+    </section>
+</body>
 </html>

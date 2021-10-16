@@ -4,7 +4,9 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Title</title>
+		<title>SteamBot</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<style type="text/css">
 			*,
 			*::before,
@@ -71,6 +73,10 @@
 				object-fit: cover;
 			}
 
+			div.code{
+				text-align: center;
+			}
+
 			.product__info {
 				padding: 10px 15px;
 				border-bottom: 1px solid #dedede;
@@ -112,6 +118,26 @@
 				color: #fff;
 			}
 
+			.copy__alert {
+				background-color: #198754;
+				width: 200px;
+				border-radius: 0 0 10px 10px;
+				color: #fff;
+				text-align: center;
+				padding: 10px 0;
+				font-weight: 700;
+
+				position: absolute;
+				top: 0;
+				left: 50%;
+				transform: translate(-50%, -100%);
+				transition: all 0.2s linear;
+			}
+
+			.copy__alert.show {
+				transform: translate(-50%, 0);
+			}
+
 			@media (max-width: 480px) {
 				.product__row span {
 					font-size: 15px;
@@ -134,7 +160,7 @@
 			<div class="product">
 				<img
 					class="product__img"
-					src=" https://cdn.cloudflare.steamstatic.com/steam/apps/1238860/header.jpg?t=1628708723"
+					src="{{ image_link }}"
 					alt=""
 				/>
 				<div class="product__info">
@@ -142,7 +168,7 @@
 						<span class="product__bold">Product Name :</span> &nbsp;
 						<a class="product__link" href="{{ game_link }}" target="_blank">
 							<span class="product__name-game" translate="no"
-								>Battlefield 4</span
+								>{{ game_name }}</span
 							>
 						</a>
 					</div>
@@ -150,36 +176,88 @@
 						<span class="product__bold" translate="no"
 							>Unique Product Code :</span
 						>
-						&nbsp;<span>702E3073A2994FC3</span>
+						&nbsp;<span>{{ code }}</span>
+					</div>
+					<div class="product__row">
+						<span class="product__bold">Bot Link :</span> &nbsp;
+						<a class="product__link" href="{{ bot_link }}" target="_blank">
+							<span class="product__name-game" translate="no"
+								>Перейти</span
+							>
+						</a>
+					</div>
+					<div class="product__row">
+						<span class="product__bold">User Link :</span> &nbsp;
+						<a class="product__link" href="{{ user_link }}" target="_blank">
+							<span class="product__name-game" translate="no"
+								>Перейти</span
+							>
+						</a>
+					</div>
+					<div class="product__row">
+						<span class="product__bold">Region :</span> &nbsp;
+						<a class="product__link" target="_blank">
+							<span class="product__name-game" translate="no"
+								>{{ region }}</span
+							>
+						</a>
 					</div>
 				</div>
 				<div class="product__info">
 					<div class="product__row">
-						<span class="product__bold">Account Name :</span> &nbsp;
-						<span class="product__copy" id="copy" translate="no"
-							>newumujap</span
-						>
+						<span class="product__bold">Status :</span> &nbsp;
+						<span class="product__copy status" id="copy" translate="no"
+							><div class="spinner-grow" role="status">
+  							<span class="sr-only">Loading...</span>
+							</div></span>
+						<script>
+
+							let data = {
+									sell_code: "{{ code }}"
+								}
+
+							function sleep (time) {
+							  return new Promise((resolve) => setTimeout(resolve, time));
+							}
+
+							function getAccount() {
+								$.ajax({
+										method: "GET",
+										dataType: "json",
+										data: data,
+										url: {% url "load_status" %},
+										success: function(data){
+											console.log(data["data"]["status"]);
+											status = data["data"]["status"];
+											if (status != null) {
+												$('.status').html(status);
+												sleep(50000).then(() => {
+													getAccount()
+												});
+											} else {
+												sleep(50000).then(() => {
+													getAccount()
+												});
+											}
+
+										}
+								})
+							}
+							getAccount()
+
+						</script>
 					</div>
-					<div class="product__row">
-						<span class="product__bold">Account Password :</span> &nbsp;
-						<span class="product__copy" id="copy" translate="no"
-							>4poD5tDN4W</span
-						>
-					</div>
+
 				</div>
-				<div class="product__info">
-					<div class="product__row">
-						<button class="product__btn" type="button">
-							Get code for change email
-						</button>
-						<script></script>
-						<div id="myOutput"></div>
-					</div>
-				</div>
+
 			</div>
 		</main>
+		<div class="copy__alert">
+			<p class="copy__alert-text">Текст скопирован</p>
+		</div>
 		<script>
 			const copyText = document.querySelectorAll("#copy");
+			const copyAlert = document.querySelector(".copy__alert");
 
 			copyText.forEach(item => {
 				item.addEventListener("click", () => {
@@ -189,6 +267,11 @@
 					textArea.select();
 					document.execCommand("Copy");
 					textArea.remove();
+
+					copyAlert.classList.add("show");
+					setTimeout(() => {
+						copyAlert.classList.remove("show");
+					}, 2000);
 				});
 			});
 		</script>
