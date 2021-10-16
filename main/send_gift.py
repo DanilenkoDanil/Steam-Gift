@@ -5,6 +5,7 @@ from . import get_friends
 import chromedriver_autoinstaller
 
 import undetected_chromedriver.v2 as uc
+from webdriver_manager.chrome import ChromeDriverManager
 
 from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
 from seleniumwire import webdriver
