@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib import admin
 
-from .models import Account, Game, Order
+from .models import Account, Game, Order, Handmade
 
 
 class AccountForm(forms.ModelForm):
@@ -61,18 +61,32 @@ class OrderForm(forms.ModelForm):
             'user_link',
             'country',
             'status',
+            'skype_link',
+            'shop_link',
         )
         widgets = {
             'sell_code': forms.TextInput,
             'user_link': forms.TextInput,
             'status': forms.TextInput,
+            'skype_link': forms.TextInput,
+            'shop_link': forms.TextInput,
         }
 
 
+class HandmadeForm(forms.ModelForm):
 
-
-
-
-
-
-
+    class Meta:
+        model = Handmade
+        fields = (
+            'code',
+            'title',
+            'text',
+            'skype_link',
+            'shop_link'
+        )
+        widgets = {
+            'code': forms.TextInput,
+            'title': forms.TextInput,
+            'skype_link': forms.TextInput,
+            'shop_link': forms.TextInput,
+        }
