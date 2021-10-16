@@ -93,6 +93,12 @@ class Order(models.Model):
         verbose_name='Время получения',
         auto_now_add=True,
     )
+    skype_link = models.TextField(
+        verbose_name='Ссылка на скайп'
+    )
+    shop_link = models.TextField(
+        verbose_name='Ссылка на магазин'
+    )
 
     def __str__(self):
         return f'{self.sell_code} - {self.status}'
@@ -146,6 +152,12 @@ class Shop(models.Model):
     seller_id = models.TextField(
         verbose_name='Seller ID'
     )
+    skype_link = models.TextField(
+        verbose_name='Ссылка на скайп'
+    )
+    shop_link = models.TextField(
+        verbose_name='Ссылка на магазин'
+    )
 
     def __str__(self):
         return f'Магазин - {self.name}'
@@ -153,3 +165,54 @@ class Shop(models.Model):
     class Meta:
         verbose_name = "Магазин"
         verbose_name_plural = 'Магазины'
+
+
+class Handmade(models.Model):
+    code = models.TextField(
+        verbose_name='Код',
+        unique=True
+    )
+    title = models.TextField(
+        verbose_name='Тема',
+    )
+    text = models.TextField(
+        verbose_name='Текст',
+    )
+    skype_link = models.TextField(
+        verbose_name='Ссылка на скайп'
+    )
+    shop_link = models.TextField(
+        verbose_name='Ссылка на магазин'
+    )
+
+    def __str__(self):
+        return f'Код - {self.title}'
+
+    class Meta:
+        verbose_name = "Ручная страница"
+        verbose_name_plural = 'Ручные страницы'
+
+
+class Status(models.Model):
+
+    YESNO_CHOICES = (
+        ('eng', 'English'),
+        ('ru', 'Russian'),
+    )
+    status_type = models.TextField(
+        verbose_name='Тип Статуса',
+    )
+    text = models.TextField(
+        verbose_name='Текст',
+    )
+    lang = models.TextField(
+        verbose_name='Язык',
+        choices=YESNO_CHOICES
+    )
+
+    def __str__(self):
+        return f'Статус - {self.status_type}'
+
+    class Meta:
+        verbose_name = "Статус"
+        verbose_name_plural = 'Статусы'
