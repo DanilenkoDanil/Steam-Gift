@@ -84,10 +84,10 @@ def gift_game(driver, game_link, friend_name):
     except NoSuchElementException:
         driver.find_element_by_xpath("//*[contains(@href,'addBundleToCart')]").click()
 
-    time.sleep(4)
+    time.sleep(5)
     # Купить в подарок
     driver.find_element_by_xpath('//*[@id="btn_purchase_gift"]/span').click()
-    time.sleep(4)
+    time.sleep(12)
     # Выбрать друга
     friends_table = driver.find_element_by_xpath('//*[@id="friends_chooser"]')
     friends = friends_table.find_elements_by_tag_name('div')
