@@ -107,7 +107,7 @@ def gift_game(driver, game_link, friend_name):
     time.sleep(3)
     driver.find_element_by_xpath('//*[@id="submit_gift_note_btn"]/span').click()
 
-    time.sleep(3)
+    time.sleep(8)
     # Покупка
     driver.find_element_by_xpath('//*[@id="accept_ssa"]').click()
     driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
