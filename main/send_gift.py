@@ -96,6 +96,7 @@ def gift_game(driver, game_link, friend_name):
             friend.click()
     time.sleep(3)
     # Продолжить
+    print("Breaaaaaaaaaaaaaaak")
     driver.find_element_by_xpath('//*[@id="gift_recipient_tab"]/div[3]/div/a/span').click()
     time.sleep(8)
     # Заполняем письмо
@@ -105,10 +106,12 @@ def gift_game(driver, game_link, friend_name):
     time.sleep(1)
     driver.find_element_by_xpath('//*[@id="gift_signature"]').send_keys('BBB')
     time.sleep(3)
+    print("Breaaaaaaaaaaaaaaak")
     driver.find_element_by_xpath('//*[@id="submit_gift_note_btn"]/span').click()
 
     time.sleep(8)
     # Покупка
+    print("Breaaaaaaaaaaaaaaak")
     driver.find_element_by_xpath('//*[@id="accept_ssa"]').click()
     driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
 
