@@ -28,8 +28,6 @@ def send_message(message, token, users):
             bot.send_message(i.user_id, message)
         except Exception as e:
             print(e)
-    bot.stop_bot()
-
 
 @background
 def add_friend(login, target_link, order_id, task_name):
