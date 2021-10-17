@@ -70,6 +70,7 @@ def check_gift_status(login, target_name, order_id, task_name):
         order.status = 'Check Error'
         order.save()
 
+
 @background
 def send_gift_to_user(login, order_code, task_name):
     print(task_name)
@@ -107,6 +108,29 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
             check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
+    except Exception as e:
+        print(e)
+        check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
+
+
+@background(schedule=30)
+def check_friends_list_first(bot_login, order_code, bot_link, user_link, task_name):
+    print(task_name)
+    print('!!!!!!!!!!!!!!!!!!!!!1111111111111111111111111111')
+    print(order_code)
+    print(bot_link)
+    print(user_link)
+    order = get_order_by_sell_code(order_code)
+    print('!!!!!!!!!!!!!!!!!!!!!')
+    try:
+        result = get_friends.check_friends(bot_link, user_link)
+        if result:
+            print("Бот в друзьях")
+            order.status = 'Sending Gift'
+            order.save()
+            send_gift_to_user(bot_login, order_code, 'Send Gift')
+        else:
+            add_friend(bot_login, user_link, order_code, 'Add to Friends')
     except Exception as e:
         print(e)
         check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
@@ -223,7 +247,7 @@ def index(request):
                               country=country, skype_link=i.skype_link, shop_link=i.shop_link)
                 order.save()
 
-                add_friend(account.steam_login, user_link, code, 'Add to Friends')
+                check_friends_list_first(account.steam_login, code, account.link, user_link, 'First Check')
 
                 message = f"""Новая покупка!
 Код - {code}
