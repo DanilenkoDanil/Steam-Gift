@@ -94,10 +94,10 @@ def gift_game(driver, game_link, friend_name):
     for friend in friends:
         if friend.text == friend_name:
             friend.click()
-    time.sleep(4)
+    time.sleep(3)
     # Продолжить
     driver.find_element_by_xpath('//*[@id="gift_recipient_tab"]/div[3]/div/a/span').click()
-    time.sleep(4)
+    time.sleep(8)
     # Заполняем письмо
     driver.find_element_by_xpath('//*[@id="gift_recipient_name"]').send_keys('Your game')
     time.sleep(1)
