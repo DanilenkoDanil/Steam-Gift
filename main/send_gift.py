@@ -100,6 +100,8 @@ def gift_game(driver, game_link, friend_name):
     driver.find_element_by_xpath('//*[@id="gift_recipient_tab"]/div[3]/div/a/span').click()
     print("Breaaaaaaaaaaaaaaak")
     time.sleep(15)
+    print(driver.page_source)
+    time.sleep(1000)
     # Заполняем письмо
     driver.find_element_by_xpath('//*[@id="gift_recipient_name"]').send_keys('Your game')
     time.sleep(2)
