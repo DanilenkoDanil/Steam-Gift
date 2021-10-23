@@ -52,18 +52,9 @@
 
             <div class="main__text">
                 <h1 class="main__title">{{ game_name }}</h1>
-                <p class="main__subtitle rus_lang">Это FAQ для пользователей, изучите его прежде чем обращаться в поддержку, если у вас возникли проблеммы:</p>
-                <p class="main__subtitle en_lang">This is a user FAQ, please check it before contacting support if you have any problems:</p>
-                <ul class="main__list">
-                    <li class="rus_lang">Пункт первый</li>
-                    <li class="rus_lang">Пункт второй</li>
-                    <li class="rus_lang">Пункт третий</li>
-                    <li class="en_lang">Point first</li>
-                    <li class="en_lang">Point second</li>
-                    <li class="en_lang">Point third</li>
-                </ul>
-                <p class="rus_lang">Спасибо за внимание!</p>
-                <p class="en_lang">Thank you for the attention!</p>
+
+                <div class="rus_lang">{{ description_ru|linebreaksbr }}</div>
+                <div class="en_lang">{{ description_eng|linebreaksbr }}</div>
 
                 <div class="main__text_bot">
                     <p class="rus_lang">Регион аккаунта: {{ region }}</p>
