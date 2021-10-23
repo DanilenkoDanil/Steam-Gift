@@ -53,6 +53,12 @@ class Game(models.Model):
     sub_id = models.PositiveIntegerField(
         verbose_name='SubID'
     )
+    description_ru = models.TextField(
+        verbose_name='Описание RU'
+    )
+    description_eng = models.TextField(
+        verbose_name='Описание ENG'
+    )
     priority_list = models.TextField(
         verbose_name='Приоритеты',
         blank=True
@@ -67,6 +73,19 @@ class Game(models.Model):
 
 
 class Order(models.Model):
+    STATUS_CHOICES = (
+        ('Add to Friends', 'Add to Friends'),
+        ('Sending Gift', 'Sending Gift'),
+        ('Check Error', 'Check Error'),
+        ('Send Gift Error', 'Send Gift Error'),
+        ('Add Friend Error', 'Add Friend Error'),
+        ('Add to Friends', 'Add to Friends'),
+        ('Gift Rejected', 'Gift Rejected'),
+        ('Gift Received', 'Gift Received'),
+        ('Gift Sent', 'Gift Sent'),
+        ('Accept Request', 'Accept Request'),
+    )
+
     sell_code = models.TextField(
         verbose_name='Код продажи'
     )
@@ -87,7 +106,8 @@ class Order(models.Model):
         verbose_name='Страна'
     )
     status = models.TextField(
-        verbose_name='Status'
+        verbose_name='Status',
+        choices=STATUS_CHOICES
     )
     created_at = models.DateTimeField(
         verbose_name='Время получения',
@@ -115,6 +135,9 @@ class TelegramBot(models.Model):
     key = models.TextField(
         verbose_name='Ключ',
         unique=True
+    )
+    link = models.TextField(
+        verbose_name='Ссылка'
     )
 
     def __str__(self):
