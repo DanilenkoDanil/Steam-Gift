@@ -21,13 +21,15 @@ def get_shops() -> Shop:
 
 
 def send_message(message, token, users):
-    bot = telebot.TeleBot(token)
+    bot = telebot.TeleBot(token, parse_mode=None)
     for i in users:
         print(f"{i.user_id} - send")
         try:
             bot.send_message(i.user_id, message)
         except Exception as e:
             print(e)
+    bot.stop_bot()
+
 
 @background
 def add_friend(login, target_link, order_id, task_name):
@@ -111,7 +113,7 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
         check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
 
 
-@background(schedule=30)
+@background(schedule=2)
 def check_friends_list_first(bot_login, order_code, bot_link, user_link, task_name):
     print(task_name)
     print('!!!!!!!!!!!!!!!!!!!!!1111111111111111111111111111')
@@ -259,6 +261,8 @@ def index(request):
                 return render(request, 'main/account.html',
                               {'game_name': game.name,
                                'game_link': game_link,
+                               'description_ru': game.description_ru,
+                               'description_eng': game.description_eng,
                                'image_link': image_link,
                                'code': code,
                                'user_link': user_link,
@@ -319,6 +323,8 @@ def index(request):
                       {'game_name': order.game.name,
                        'game_link': game_link,
                        'image_link': image_link,
+                       'description_ru': order.game.description_ru,
+                       'description_eng': order.game.description_eng,
                        'code': code,
                        'user_link': order.user_link,
                        'bot_link': order.bot.link,
