@@ -34,7 +34,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(TelegramBot)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'key')
+    list_display = ('name', 'key', 'link')
 
 
 @admin.register(TelegramAccount)
