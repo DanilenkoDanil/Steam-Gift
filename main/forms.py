@@ -39,6 +39,8 @@ class GameForm(forms.ModelForm):
             'sell_code',
             'name',
             'app_code',
+            'description_ru',
+            'description_eng',
             'sub_id',
             'priority_list'
         )
@@ -67,7 +69,6 @@ class OrderForm(forms.ModelForm):
         widgets = {
             'sell_code': forms.TextInput,
             'user_link': forms.TextInput,
-            'status': forms.TextInput,
             'skype_link': forms.TextInput,
             'shop_link': forms.TextInput,
         }
