@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import admin
 
+from . import get_name
 from .models import Account, Game, Order, Handmade
 
 
@@ -37,7 +38,6 @@ class GameForm(forms.ModelForm):
         model = Game
         fields = (
             'sell_code',
-            'name',
             'app_code',
             'description_ru',
             'description_eng',
@@ -45,7 +45,6 @@ class GameForm(forms.ModelForm):
             'priority_list'
         )
         widgets = {
-            'name': forms.TextInput,
             'steam_password': forms.TextInput,
             'sub_id': forms.TextInput,
             'priority_list': forms.TextInput,
