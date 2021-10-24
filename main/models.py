@@ -1,4 +1,5 @@
 from django.db import models
+from . import get_name
 
 
 class Account(models.Model):
@@ -44,9 +45,7 @@ class Game(models.Model):
     sell_code = models.PositiveIntegerField(
         verbose_name='Код продажи'
     )
-    name = models.TextField(
-        verbose_name='Название игры'
-    )
+
     app_code = models.PositiveIntegerField(
         verbose_name='Код игры в стиме'
     )
@@ -63,9 +62,18 @@ class Game(models.Model):
         verbose_name='Приоритеты',
         blank=True
     )
+    name = models.TextField(
+        verbose_name='Название игры',
+        blank=True
+    )
 
     def __str__(self):
         return f'{self.sell_code} - {self.name}'
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # this will ensure that the object is new
+            self.name = get_name.get_name_game(f'{self.app_code}')
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Игра"
