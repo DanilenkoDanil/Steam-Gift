@@ -17,8 +17,9 @@ class AccountForm(forms.ModelForm):
             'link',
             'country',
             'proxy',
-            'status',
-            'balance'
+            'balance',
+            'file'
+
         )
         widgets = {
             'steam_login': forms.TextInput,
