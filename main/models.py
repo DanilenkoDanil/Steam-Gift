@@ -16,10 +16,6 @@ class Account(models.Model):
     email_password = models.TextField(
         verbose_name='Пароль от почты'
     )
-    status = models.BooleanField(
-        verbose_name='Статус аккаунта',
-        null=True,
-    )
     link = models.TextField(
         verbose_name='Ссылка'
     )
@@ -31,6 +27,10 @@ class Account(models.Model):
     )
     balance = models.TextField(
         verbose_name='Баланс'
+    )
+    file = models.ImageField(
+        verbose_name='Файл',
+        upload_to='main/guard/'
     )
 
     def __str__(self):
