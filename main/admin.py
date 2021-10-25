@@ -7,7 +7,7 @@ from .models import Account, Game, Shop, Order, TelegramBot, TelegramAccount, Ha
 @admin.register(Account)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'steam_login', 'steam_password', 'email', 'email_password', 'link', 'status', 'country', 'proxy', 'balance'
+        'id', 'steam_login', 'steam_password', 'email', 'email_password', 'link', 'country', 'proxy', 'balance'
     )
     form = AccountForm
     search_fields = ['steam_login']
@@ -15,7 +15,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('sell_code', 'game', 'bot', 'user_link', 'country', 'status', 'created_at')
+    list_display = ('sell_code', 'game', 'bot', 'user_link', 'country', 'created_at')
     search_fields = ['sell_code', 'name', 'sub_id', 'account', 'status', 'created_at']
     form = OrderForm
 
