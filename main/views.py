@@ -180,7 +180,7 @@ def get_order_by_sell_code(code: str) -> Order:
 
 
 def get_user(user_type: str) -> Account:
-    return Account.objects.filter(type=user_type, status=None)[0]
+    return Account.objects.filter(type=user_type)[0]
 
 
 def get_telegram_token(name: str) -> TelegramBot:
@@ -192,15 +192,15 @@ def get_telegram_users() -> TelegramAccount:
 
 
 def get_user_by_login(login: str) -> Account:
-    return Account.objects.filter(steam_login=login, status=None)[0]
+    return Account.objects.filter(steam_login=login)[0]
 
 
 def get_user_by_country(country: str) -> Account:
-    return Account.objects.filter(country=country, status=None)[0]
+    return Account.objects.filter(country=country)[0]
 
 
 def get_user_by_id(number: str) -> Account:
-    return Account.objects.filter(id=number, status=None)[0]
+    return Account.objects.filter(id=number)[0]
 
 
 def get_game(product_code: str) -> Game:
