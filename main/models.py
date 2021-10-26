@@ -28,7 +28,7 @@ class Account(models.Model):
     balance = models.TextField(
         verbose_name='Баланс'
     )
-    file = models.ImageField(
+    file = models.FileField(
         verbose_name='Файл',
         upload_to='main/guard/'
     )
