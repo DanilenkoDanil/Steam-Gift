@@ -28,7 +28,6 @@ def send_message(message, token, users):
             bot.send_message(i.user_id, message)
         except Exception as e:
             print(e)
-    bot.stop_bot()
 
 
 @background
@@ -62,9 +61,29 @@ def check_gift_status(login, target_name, order_id, task_name):
         elif status == 'Received':
             order.status = 'Gift Received'
             order.save()
+
+            message = f"""Гифт принят!
+            Код - {order_id}
+            {order.game.name} - {target_name}"""
+
+            token = get_telegram_token('info').key
+            users = get_telegram_users()
+
+            send_message(message, token, users)
+
         elif status == 'Rejected':
             order.status = 'Gift Rejected'
             order.save()
+
+            message = f"""Гифт Отклонён!
+            Код - {order_id}
+            {order.game.name} - {target_name}"""
+
+            token = get_telegram_token('info').key
+            users = get_telegram_users()
+
+            send_message(message, token, users)
+
     except Exception as e:
         print(e)
         order.status = 'Check Error'
@@ -85,9 +104,18 @@ def send_gift_to_user(login, order_code, task_name):
         check_gift_status(login, target_name, order_code, 'Check Gift Status', schedule=120)
     except Exception as e:
         print(e)
+
         order.status = 'Send Gift Error'
         order.save()
 
+        message = f"""Произошёл сбой в отправке гифта!
+        Код - {order_code}
+        {order.game.name} - {target_name}"""
+
+        token = get_telegram_token('info').key
+        users = get_telegram_users()
+
+        send_message(message, token, users)
 
 # 5 СЕКУНД!
 @background(schedule=30)
