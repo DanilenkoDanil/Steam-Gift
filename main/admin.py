@@ -15,7 +15,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('sell_code', 'game', 'bot', 'user_link', 'country', 'created_at')
+    list_display = ('sell_code', 'game', 'bot', 'user_link', 'country', 'status', 'created_at')
     search_fields = ['sell_code', 'name', 'sub_id', 'account', 'status', 'created_at']
     form = OrderForm
 
