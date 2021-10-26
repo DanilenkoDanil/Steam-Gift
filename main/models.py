@@ -2,6 +2,16 @@ from django.db import models
 from . import get_name
 
 
+class OverwriteStorage(FileSystemStorage):
+    def _save(self, name, content):
+        if self.exists(name):
+            self.delete(name)
+        return super(OverwriteStorage, self)._save(name, content)
+
+    def get_available_name(self, name):
+        return name
+
+    
 class Account(models.Model):
     steam_login = models.TextField(
         verbose_name="Логин пользователя в Steam",
@@ -30,7 +40,8 @@ class Account(models.Model):
     )
     file = models.FileField(
         verbose_name='Файл',
-        upload_to='main/guard/'
+        upload_to='main/guard/',
+        storage=OverwriteStorage()
     )
 
     def __str__(self):
