@@ -14,7 +14,9 @@ from pyvirtualdisplay import Display
 
 
 def steam_login(driver, login: str, password: str):
-    driver.get('http://steamcommunity.com/login/home/?goto=')
+    driver.get('https://store.steampowered.com/')
+    time.sleep(10)
+    driver.find_element_by_xpath('//*[@id="global_action_menu"]/a').click()
     time.sleep(10)
     try:
         login_input = driver.find_element_by_xpath('//*[@id="input_username"]')
@@ -54,6 +56,8 @@ def steam_login(driver, login: str, password: str):
         driver.find_element_by_xpath('//*[@id="login_twofactorauth_buttonset_incorrectcode"]/div[1]/div[1]').click()
 
     except NoSuchElementException:
+        pass
+    except ElementNotInteractableException:
         pass
 
     return True
@@ -178,7 +182,7 @@ def main(login, password, target_name, game_link, proxy):
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
 
     steam_login(driver, login, password)
-    time.sleep(3)
+    time.sleep(6)
 
     gift_game(driver, game_link, target_name)
 
@@ -203,7 +207,7 @@ def main_friend_add(login: str, password: str, proxy: str, target_link: str):
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
 
     steam_login(driver, login, password)
-    time.sleep(3)
+    time.sleep(6)
 
     add_friend(driver, target_link)
 
