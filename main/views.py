@@ -47,43 +47,63 @@ def add_friend(login, target_link, order_id, task_name):
 
 
 @background
-def check_gift_status(login, target_name, order_id, task_name):
+def remove_friend(login, target_link, order_id, task_name):
     print(task_name)
     order = get_order_by_sell_code(order_id)
     bot = get_user_by_login(login)
+    try:
+        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.proxy, target_link)
+        order.status = 'Accept Request'
+        order.save()
+        check_friends_list(login, order_id, bot.link, target_link, 'Check friends')
+    except Exception as e:
+        print(e)
+        order.status = 'Add Friend Error'
+        order.save()
+
+
+@background
+def check_gift_status(login, target_name, order_id, task_name):
+    print(task_name)
+    order = get_order_by_sell_code(order_id)
+    order.check_count += 1
+    order.save()
+    bot = get_user_by_login(login)
     game_name = order.game.name
     try:
-        status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.proxy, target_name, game_name)
-        if status == 'Submitted':
-            order.status = 'Gift Sent'
-            order.save()
-            check_gift_status(login, target_link, order_id, task_name, schedule=600)
-        elif status == 'Received':
-            order.status = 'Gift Received'
-            order.save()
+        if order.check_count < 6:
+            status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.proxy, target_name, game_name)
+            if status == 'Submitted':
+                order.status = 'Gift Sent'
+                order.save()
+                check_gift_status(login, target_link, order_id, task_name, schedule=1200)
+            elif status == 'Received':
+                order.status = 'Gift Received'
+                order.save()
 
-            message = f"""Гифт принят!
-            Код - {order_id}
-            {order.game.name} - {target_name}"""
+                message = f"""Гифт принят!
+                Код - {order_id}
+                {order.game.name} - {target_name}"""
 
-            token = get_telegram_token('info').key
-            users = get_telegram_users()
+                token = get_telegram_token('info').key
+                users = get_telegram_users()
 
-            send_message(message, token, users)
+                send_message(message, token, users)
 
-        elif status == 'Rejected':
-            order.status = 'Gift Rejected'
-            order.save()
+            elif status == 'Rejected':
+                order.status = 'Gift Rejected'
+                order.save()
 
-            message = f"""Гифт Отклонён!
-            Код - {order_id}
-            {order.game.name} - {target_name}"""
+                message = f"""Гифт Отклонён!
+                Код - {order_id}
+                {order.game.name} - {target_name}"""
 
-            token = get_telegram_token('info').key
-            users = get_telegram_users()
+                token = get_telegram_token('info').key
+                users = get_telegram_users()
 
-            send_message(message, token, users)
-
+                send_message(message, token, users)
+        else:
+            print('Слишком много проверок, статус больше не обновляеться')
     except Exception as e:
         print(e)
         order.status = 'Check Error'
@@ -109,15 +129,15 @@ def send_gift_to_user(login, order_code, task_name):
         order.save()
 
         message = f"""Произошёл сбой в отправке гифта!
-        Код - {order_code}
-        {order.game.name} - {target_name}"""
+Код - {order_code}
+{order.game.name} - {target_name}"""
 
         token = get_telegram_token('info').key
         users = get_telegram_users()
 
         send_message(message, token, users)
 
-# 5 СЕКУНД!
+
 @background(schedule=30)
 def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
     print(task_name)
@@ -393,7 +413,6 @@ def handmade(request):
                                'title': handmade.title,
                                'text': handmade.text,
                                })
-
 
 
 def head(request):
