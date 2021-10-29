@@ -1,4 +1,5 @@
 /* reset START */
+{% load static %}
 html {
     box-sizing: border-box;
 }
@@ -34,8 +35,9 @@ button, input {
 }
 
 body {
-   background: #1d212c;
+   background-image: url(../img/fon.jpg);
    color: #fff;
+   background-size: cover;
 }
 
 .container {
@@ -132,7 +134,7 @@ body {
 .main__subtitle {
     padding-bottom: 5px;
 }
- 
+
 .main__list {
     margin-left: 15px;
 }
