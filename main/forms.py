@@ -43,7 +43,8 @@ class GameForm(forms.ModelForm):
             'description_ru',
             'description_eng',
             'sub_id',
-            'priority_list'
+            'priority_list',
+            'price'
         )
         widgets = {
             'steam_password': forms.TextInput,
