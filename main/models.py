@@ -1,248 +1,53 @@
-from django.db import models
-from . import get_name
-  
-class Account(models.Model):
-    steam_login = models.TextField(
-        verbose_name="Логин пользователя в Steam",
-        unique=True
-    )
-    steam_password = models.TextField(
-        verbose_name="Пароль от Steam"
-    )
-    email = models.TextField(
-        verbose_name='Почта к которой привязан аккаунт'
-    )
-    email_password = models.TextField(
-        verbose_name='Пароль от почты'
-    )
-    link = models.TextField(
-        verbose_name='Ссылка'
-    )
-    country = models.TextField(
-        verbose_name='Страна'
-    )
-    proxy = models.TextField(
-        verbose_name='Прокси'
-    )
-    balance = models.TextField(
-        verbose_name='Баланс'
-    )
-    file = models.FileField(
-        verbose_name='Файл',
-        upload_to='main/guard/',
-    )
+from django.contrib import admin
 
-    def __str__(self):
-        return f'#{self.steam_login}'
-
-    class Meta:
-        verbose_name = 'Аккаунт'
-        verbose_name_plural = 'Аккаунты'
+from .forms import AccountForm, GameForm, OrderForm, HandmadeForm
+from .models import Account, Game, Shop, Order, TelegramBot, TelegramAccount, Handmade, Status
 
 
-class Game(models.Model):
-    sell_code = models.PositiveIntegerField(
-        verbose_name='Код продажи'
+@admin.register(Account)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'steam_login', 'steam_password', 'email', 'email_password', 'link', 'country', 'proxy', 
     )
-
-    app_code = models.PositiveIntegerField(
-        verbose_name='Код игры в стиме'
-    )
-    sub_id = models.PositiveIntegerField(
-        verbose_name='SubID'
-    )
-    description_ru = models.TextField(
-        verbose_name='Описание RU'
-    )
-    description_eng = models.TextField(
-        verbose_name='Описание ENG'
-    )
-    priority_list = models.TextField(
-        verbose_name='Приоритеты',
-        blank=True
-    )
-    name = models.TextField(
-        verbose_name='Название игры',
-        blank=True
-    )
-
-    def __str__(self):
-        return f'{self.sell_code} - {self.name}'
-
-    def save(self, *args, **kwargs):
-        if not self.pk:  # this will ensure that the object is new
-            self.name = get_name.get_name_game(f'{self.app_code}')
-        super().save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = "Игра"
-        verbose_name_plural = 'Игры'
+    form = AccountForm
+    search_fields = ['steam_login']
 
 
-class Order(models.Model):
-    STATUS_CHOICES = (
-        ('Add to Friends', 'Add to Friends'),
-        ('Sending Gift', 'Sending Gift'),
-        ('Check Error', 'Check Error'),
-        ('Send Gift Error', 'Send Gift Error'),
-        ('Add Friend Error', 'Add Friend Error'),
-        ('Add to Friends', 'Add to Friends'),
-        ('Gift Rejected', 'Gift Rejected'),
-        ('Gift Received', 'Gift Received'),
-        ('Gift Sent', 'Gift Sent'),
-        ('Accept Request', 'Accept Request'),
-    )
-
-    sell_code = models.TextField(
-        verbose_name='Код продажи'
-    )
-    game = models.ForeignKey(
-        to='main.Game',
-        verbose_name='Игра',
-        on_delete=models.PROTECT,
-    )
-    bot = models.ForeignKey(
-        to='main.Account',
-        verbose_name='Аккаунт',
-        on_delete=models.PROTECT,
-    )
-    user_link = models.TextField(
-        verbose_name='Аккаунт покупателя'
-    )
-    country = models.TextField(
-        verbose_name='Страна'
-    )
-    status = models.TextField(
-        verbose_name='Status',
-        choices=STATUS_CHOICES
-    )
-    created_at = models.DateTimeField(
-        verbose_name='Время получения',
-        auto_now_add=True,
-    )
-    skype_link = models.TextField(
-        verbose_name='Ссылка на скайп'
-    )
-    shop_link = models.TextField(
-        verbose_name='Ссылка на магазин'
-    )
-
-    def __str__(self):
-        return f'{self.sell_code} - {self.status}'
-
-    class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = 'Заказы'
+@admin.register(Order)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('sell_code', 'game', 'bot', 'user_link', 'country', 'status', 'created_at')
+    search_fields = ['sell_code', 'name', 'sub_id', 'account', 'status', 'created_at']
+    form = OrderForm
 
 
-class TelegramBot(models.Model):
-    name = models.TextField(
-        verbose_name='Имя бота',
-    )
-    key = models.TextField(
-        verbose_name='Ключ',
-        unique=True
-    )
-    link = models.TextField(
-        verbose_name='Ссылка'
-    )
-
-    def __str__(self):
-        return f'Бот - {self.name} - {self.key}'
-
-    class Meta:
-        verbose_name = "Телеграм бот"
-        verbose_name_plural = 'Телеграм боты'
+@admin.register(Game)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('sell_code', 'name', 'app_code', 'sub_id', 'priority_list', 'price')
+    search_fields = ['name', 'sell_code', 'app_code', 'sub_id']
+    form = GameForm
 
 
-class TelegramAccount(models.Model):
-    name = models.TextField(
-        verbose_name='Имя юзера',
-    )
-    user_id = models.TextField(
-        verbose_name='UserId',
-        unique=True
-    )
-
-    def __str__(self):
-        return f'Бот - {self.name} - {self.user_id}'
-
-    class Meta:
-        verbose_name = "Телеграм Аккаунт"
-        verbose_name_plural = 'Телеграм Аккаунты'
+@admin.register(Shop)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'guid', 'seller_id', 'skype_link', 'shop_link')
 
 
-class Shop(models.Model):
-    name = models.TextField(
-        verbose_name='Название магазина',
-    )
-    guid = models.TextField(
-        verbose_name='API Guid',
-    )
-    seller_id = models.TextField(
-        verbose_name='Seller ID'
-    )
-    skype_link = models.TextField(
-        verbose_name='Ссылка на скайп'
-    )
-    shop_link = models.TextField(
-        verbose_name='Ссылка на магазин'
-    )
-
-    def __str__(self):
-        return f'Магазин - {self.name}'
-
-    class Meta:
-        verbose_name = "Магазин"
-        verbose_name_plural = 'Магазины'
+@admin.register(TelegramBot)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'key', 'link')
 
 
-class Handmade(models.Model):
-    code = models.TextField(
-        verbose_name='Код',
-        unique=True
-    )
-    title = models.TextField(
-        verbose_name='Тема',
-    )
-    text = models.TextField(
-        verbose_name='Текст',
-    )
-    skype_link = models.TextField(
-        verbose_name='Ссылка на скайп'
-    )
-    shop_link = models.TextField(
-        verbose_name='Ссылка на магазин'
-    )
-
-    def __str__(self):
-        return f'Код - {self.title}'
-
-    class Meta:
-        verbose_name = "Ручная страница"
-        verbose_name_plural = 'Ручные страницы'
+@admin.register(TelegramAccount)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user_id')
 
 
-class Status(models.Model):
+@admin.register(Handmade)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('code', 'title', 'skype_link', 'shop_link')
+    form = HandmadeForm
 
-    YESNO_CHOICES = (
-        ('eng', 'English'),
-        ('ru', 'Russian'),
-    )
-    status_type = models.TextField(
-        verbose_name='Тип Статуса',
-    )
-    text = models.TextField(
-        verbose_name='Текст',
-    )
-    lang = models.TextField(
-        verbose_name='Язык',
-        choices=YESNO_CHOICES
-    )
 
-    def __str__(self):
-        return f'Статус - {self.status_type}'
-
-    class Meta:
-        verbose_name = "Статус"
-        verbose_name_plural = 'Статусы'
+@admin.register(Status)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('status_type', 'text', 'lang')
