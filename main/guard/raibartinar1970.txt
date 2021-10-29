@@ -1,6 +1,0 @@
-{
-    "steamid": "76561199053500785",
-    "shared_secret": "+DXndp7GbTTJce1Ru75b6dZEt/g=",
-    "identity_secret": "ucU0Ocg1/ZNIjCmicmrCcl5GAEM="
-}
-        
