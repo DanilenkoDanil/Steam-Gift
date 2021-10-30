@@ -292,7 +292,7 @@ def index(request):
                 user_link = info['options'][0]['value']
 
                 order = Order(sell_code=code, bot=account, game=game, user_link=user_link, status='Add to Friends',
-                              country=country, skype_link=i.skype_link, shop_link=i.shop_link)
+                              country=country, skype_link=i.skype_link, shop_link=i.shop_link, check_count=0)
                 order.save()
 
                 check_friends_list_first(account.steam_login, code, account.link, user_link, 'First Check')
