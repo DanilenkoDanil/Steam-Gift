@@ -5,24 +5,21 @@ from . import get_friends
 import chromedriver_autoinstaller
 
 import undetected_chromedriver.v2 as uc
-from webdriver_manager.chrome import ChromeDriverManager
+from seleniumwire import webdriver
 
 from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
 from seleniumwire import webdriver
 from selenium.webdriver.support.select import Select
 from pyvirtualdisplay import Display
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def steam_login(driver, login: str, password: str):
-    driver.get('https://store.steampowered.com/')
+    driver.get('https://steamcommunity.com/')
     time.sleep(10)
     driver.find_element_by_xpath('//*[@id="global_action_menu"]/a').click()
     time.sleep(10)
-    try:
-        login_input = driver.find_element_by_xpath('//*[@id="input_username"]')
-    except NoSuchElementException:
-        time.sleep(15)
-        login_input = driver.find_element_by_xpath('//*[@id="input_username"]')
+    login_input = driver.find_element_by_xpath('//*[@id="input_username"]')
     for i in login:
         login_input.send_keys(i)
         time.sleep(random.uniform(0, 0.2))
@@ -44,7 +41,7 @@ def steam_login(driver, login: str, password: str):
         time.sleep(random.uniform(0, 0.2))
     driver.find_element_by_xpath('//*[@id="login_twofactorauth_buttonset_entercode"]/div[1]').click()
     time.sleep(10)
-
+    print('LOGIIIIIIINNNNNNNNNN')
     try:
         code_input = driver.find_element_by_xpath('//*[@id="twofactorcode_entry"]')
         code_input.clear()
@@ -76,7 +73,7 @@ def gift_game(driver, game_link, friend_name):
     time.sleep(3)
     try:
         select_element = driver.find_element_by_xpath('//*[@id="ageYear"]')
-        time.sleep(2)
+        time.sleep(0.5)
         Select(select_element).select_by_value('2002')
         driver.find_element_by_xpath('//*[@id="app_agegate"]/div[1]/div[3]/a[1]/span').click()
         time.sleep(1)
@@ -88,54 +85,56 @@ def gift_game(driver, game_link, friend_name):
     except NoSuchElementException:
         driver.find_element_by_xpath("//*[contains(@href,'addBundleToCart')]").click()
 
-    time.sleep(5)
+    time.sleep(1)
     # Купить в подарок
     driver.find_element_by_xpath('//*[@id="btn_purchase_gift"]/span').click()
-    time.sleep(12)
+    time.sleep(1)
     # Выбрать друга
     friends_table = driver.find_element_by_xpath('//*[@id="friends_chooser"]')
     friends = friends_table.find_elements_by_tag_name('div')
     for friend in friends:
         if friend.text == friend_name:
             friend.click()
-    time.sleep(3)
+    time.sleep(1)
     # Продолжить
-    
     driver.find_element_by_xpath('//*[@id="gift_recipient_tab"]/div[3]/div/a/span').click()
-    print("Breaaaaaaaaaaaaaaak")
-    time.sleep(8)
+    time.sleep(1)
     # Заполняем письмо
     driver.find_element_by_xpath('//*[@id="gift_recipient_name"]').send_keys('Your game')
-    time.sleep(2)
-    print("Breaaaaaaaaaaaaaaak")
+    time.sleep(0.5)
     driver.find_element_by_xpath('//*[@id="gift_message_text"]').send_keys('....')
-    time.sleep(2)
+    time.sleep(0.3)
     driver.find_element_by_xpath('//*[@id="gift_signature"]').send_keys('BBB')
-    time.sleep(3)
-    print("Breaaaaaaaaaaaaaaak")
+    time.sleep(1)
     driver.find_element_by_xpath('//*[@id="submit_gift_note_btn"]/span').click()
-
-    time.sleep(8)
+    time.sleep(3)
     # Покупка
-    print("Breaaaaaaaaaaaaaaak")
-    driver.find_element_by_xpath('//*[@id="accept_ssa"]').click()
-    driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
+    try:
+        driver.find_element_by_xpath('//*[@id="accept_ssa"]').click()
+        driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
+    except ElementNotInteractableException:
+        time.sleep(5)
+        driver.find_element_by_xpath('//*[@id="accept_ssa"]').click()
+        driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
 
-    
+
 def check_gift_status(login: str, password: str, proxy: str, nickname: str, game_name: str):
-    display = Display(size=(1920, 1080))
+    display = Display(visible=0, size=(1920, 1080))
     display.start()
 
     print('!!!!!!!!!!!!!!!!!!!!')
+    print('Прокси тут')
     print(proxy)
-    options = {
-        'proxy': {
-            'http': f'http://{proxy}',
-            'https': f'https://{proxy}',
-            'no_proxy': 'localhost,127.0.0.1'  # excludes
-        }
-    }
-    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
+    # options = {
+    #     'proxy': {
+    #         'http': f'http://{proxy}',
+    #         'https': f'https://{proxy}',
+    #         'no_proxy': 'localhost,127.0.0.1'  # excludes
+    #     }
+    # }
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-server=%s' % proxy)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
     steam_login(driver, login, password)
     time.sleep(3)
@@ -167,22 +166,26 @@ def check_gift_status(login: str, password: str, proxy: str, nickname: str, game
     display.stop()
     return 'Rejected'
 
+
 def main(login, password, target_name, game_link, proxy):
-    display = Display(size=(1920, 1080))
+    display = Display(visible=0, size=(1920, 1080))
     display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
-    chromedriver_autoinstaller.install()
-    options = {
-        'proxy': {
-            'http': f'http://{proxy}',
-            'https': f'https://{proxy}',
-            'no_proxy': 'localhost,127.0.0.1'  # excludes
-        }
-    }
-    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
+    print('Прокси тут')
+    print(proxy)
+    # options = {
+    #     'proxy': {
+    #         'http': f'http://{proxy}',
+    #         'https': f'https://{proxy}',
+    #         'no_proxy': 'localhost,127.0.0.1'  # excludes
+    #     }
+    # }
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-server=%s' % proxy)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
     steam_login(driver, login, password)
-    time.sleep(6)
+    time.sleep(15)
 
     gift_game(driver, game_link, target_name)
 
@@ -191,27 +194,31 @@ def main(login, password, target_name, game_link, proxy):
 
 
 def main_friend_add(login: str, password: str, proxy: str, target_link: str):
-    display = Display(size=(1920, 1080))
+    display = Display(visible=0, size=(1920, 1080))
     display.start()
 
     print('!!!!!!!!!!!!!!!!!!!!')
-    chromedriver_autoinstaller.install()
+    print('Прокси тут')
     print(proxy)
-    options = {
-        'proxy': {
-            'http': f'http://{proxy}',
-            'https': f'https://{proxy}',
-            'no_proxy': 'localhost,127.0.0.1'  # excludes
-        }
-    }
-    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), seleniumwire_options=options)
+    # options = {
+    #     'proxy': {
+    #         'http': f'http://{proxy}',
+    #         'https': f'https://{proxy}',
+    #         'no_proxy': 'localhost,127.0.0.1'  # excludes
+    #     }
+    # }
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-server=%s' % proxy)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
     steam_login(driver, login, password)
-    time.sleep(6)
+    time.sleep(3)
 
     add_friend(driver, target_link)
 
     driver.quit()
     display.stop()
 
-# main()
+
+# check_gift_status('raibartinar1970', 'LHtsrneGns1976', '6772uh:WHd7M4@5.101.83.130:8000', 'enormously', 'SUPERHOT VR')
+
