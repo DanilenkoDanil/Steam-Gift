@@ -76,7 +76,7 @@ def check_gift_status(login, target_name, order_id, task_name):
             if status == 'Submitted':
                 order.status = 'Gift Sent'
                 order.save()
-                check_gift_status(login, target_link, order_id, task_name, schedule=1200)
+                check_gift_status(login, target_name, order_id, task_name, schedule=1200)
             elif status == 'Received':
                 order.status = 'Gift Received'
                 order.save()
