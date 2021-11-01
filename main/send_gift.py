@@ -154,11 +154,11 @@ def check_gift_status(login: str, password: str, proxy: str, nickname: str, game
             continue
         print(status_area.text)
         if nickname in status_area.find_element_by_tag_name('a').text and game_name in i.text:
-            if 'Получен' in i.text:
+            if 'Redeemed' in i.text:
                 driver.quit()
                 # display.stop()
                 return 'Received'
-            elif 'Отправлен' in i.text:
+            elif 'Sent' in i.text:
                 driver.quit()
                 # display.stop()
                 return 'Submitted'
