@@ -412,6 +412,8 @@ def handmade(request):
                               {'code': code,
                                'title': handmade.title,
                                'text': handmade.text,
+                               'shop_link': handmade.shop_link,
+                               'skype_link': handmade.skype_link
                                })
 
 
