@@ -26,14 +26,11 @@ class Account(models.Model):
     proxy = models.TextField(
         verbose_name='Прокси'
     )
+    shared_secret = models.TextField(
+        verbose_name="Shared Secret"
+    )
     balance = models.TextField(
         verbose_name='Баланс'
-    )
-    file = models.FileField(
-        verbose_name='Файл',
-        upload_to='main/guard/',
-        null=True,
-        blank=True,
     )
 
     def __str__(self):
