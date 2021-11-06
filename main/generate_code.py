@@ -1,10 +1,11 @@
 from steam.guard import SteamAuthenticator
-import json
-import os
 
 
-def generate(username):
-    secrets = json.load(open(f'{os.getcwd()}/main/guard/{username}.txt'))
-
+def generate(shared_secret):
+    dict_secret = {'shared_secret': shared_secret}
+    secrets = dict_secret
     sa = SteamAuthenticator(secrets)
-    return sa.get_code()
+    return str(sa.get_code())
+
+
+# print(generate('+DXndp7GbTTJce1Ru75b6dZEt/g='))
