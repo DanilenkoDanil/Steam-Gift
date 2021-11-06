@@ -36,7 +36,7 @@ def add_friend(login, target_link, order_id, task_name):
     order = get_order_by_sell_code(order_id)
     bot = get_user_by_login(login)
     try:
-        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.proxy, target_link)
+        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_link)
         order.status = 'Accept Request'
         order.save()
         check_friends_list(login, order_id, bot.link, target_link, 'Check friends')
@@ -52,7 +52,7 @@ def remove_friend(login, target_link, order_id, task_name):
     order = get_order_by_sell_code(order_id)
     bot = get_user_by_login(login)
     try:
-        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.proxy, target_link)
+        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_link)
         order.status = 'Accept Request'
         order.save()
         check_friends_list(login, order_id, bot.link, target_link, 'Check friends')
@@ -72,7 +72,7 @@ def check_gift_status(login, target_name, order_id, task_name):
     game_name = order.game.name
     try:
         if order.check_count < 6:
-            status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.proxy, target_name, game_name)
+            status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_name, game_name)
             if status == 'Submitted':
                 order.status = 'Gift Sent'
                 order.save()
@@ -118,7 +118,7 @@ def send_gift_to_user(login, order_code, task_name):
     target_name = get_name.get_name(order.user_link)
     game_link = f'https://store.steampowered.com/app/{order.game.app_code}'
     try:
-        send_gift.main(bot.steam_login, bot.steam_password, target_name, game_link, bot.proxy)
+        send_gift.main(bot.steam_login, bot.steam_password, bot.shared_secret, target_name, game_link, bot.proxy)
         order.status = 'Gift Sent'
         order.save()
         check_gift_status(login, target_name, order_code, 'Check Gift Status', schedule=120)
@@ -413,7 +413,7 @@ def handmade(request):
                                'title': handmade.title,
                                'text': handmade.text,
                                'shop_link': handmade.shop_link,
-                               'skype_link': handmade.skype_link
+                               'skype_link': handmade.skype_link,
                                })
 
 
