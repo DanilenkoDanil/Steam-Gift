@@ -119,8 +119,8 @@ def gift_game(driver, game_link, friend_name):
 
 
 def check_gift_status(login: str, password: str, shared_secret: str, proxy: str, nickname: str, game_name: str):
-    #display = Display(visible=0, size=(1920, 1080))
-    #display.start()
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
 
     print('!!!!!!!!!!!!!!!!!!!!')
     print('Прокси тут')
@@ -163,13 +163,13 @@ def check_gift_status(login: str, password: str, shared_secret: str, proxy: str,
                 # display.stop()
                 return 'Submitted'
     driver.quit()
-    # display.stop()
+    display.stop()
     return 'Rejected'
 
 
 def main(login, password, shared_secret, target_name, game_link, proxy):
-    #display = Display(visible=0, size=(1920, 1080))
-    #display.start()
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
     print('Прокси тут')
     print(proxy)
@@ -190,12 +190,12 @@ def main(login, password, shared_secret, target_name, game_link, proxy):
     gift_game(driver, game_link, target_name)
 
     driver.quit()
-    #display.stop()
+    display.stop()
 
 
 def main_friend_add(login: str, password: str, shared_secret: str, proxy: str, target_link: str):
-    #display = Display(visible=0, size=(1920, 1080))
-    #display.start()
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
 
     print('!!!!!!!!!!!!!!!!!!!!')
     print('Прокси тут')
@@ -217,7 +217,7 @@ def main_friend_add(login: str, password: str, shared_secret: str, proxy: str, t
     add_friend(driver, target_link)
 
     driver.quit()
-    #display.stop()
+    display.stop()
 
 
 # check_gift_status('raibartinar1970', 'LHtsrneGns1976', '6772uh:WHd7M4@5.101.83.130:8000', 'enormously', 'SUPERHOT VR')
