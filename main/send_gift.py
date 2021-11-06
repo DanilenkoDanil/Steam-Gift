@@ -14,7 +14,7 @@ from pyvirtualdisplay import Display
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def steam_login(driver, login: str, password: str):
+def steam_login(driver, login: str, password: str, shared_secret):
     driver.get('https://steamcommunity.com/')
     time.sleep(10)
     driver.find_element_by_xpath('//*[@id="global_action_menu"]/a').click()
@@ -34,7 +34,7 @@ def steam_login(driver, login: str, password: str):
     if code_input.is_displayed() is False:
         return True
 
-    code = generate_code.generate(login)
+    code = generate_code.generate(shared_secret)
 
     for i in code:
         code_input.send_keys(i)
@@ -45,7 +45,7 @@ def steam_login(driver, login: str, password: str):
     try:
         code_input = driver.find_element_by_xpath('//*[@id="twofactorcode_entry"]')
         code_input.clear()
-        code = generate_code.generate(login)
+        code = generate_code.generate(shared_secret)
         for i in code:
             code_input.send_keys(i)
             time.sleep(random.uniform(0, 0.2))
@@ -118,9 +118,9 @@ def gift_game(driver, game_link, friend_name):
         driver.find_element_by_xpath('//*[@id="purchase_button_bottom_text"]').click()
 
 
-def check_gift_status(login: str, password: str, proxy: str, nickname: str, game_name: str):
-    display = Display(visible=0, size=(1920, 1080))
-    display.start()
+def check_gift_status(login: str, password: str, shared_secret: str, proxy: str, nickname: str, game_name: str):
+    #display = Display(visible=0, size=(1920, 1080))
+    #display.start()
 
     print('!!!!!!!!!!!!!!!!!!!!')
     print('Прокси тут')
@@ -136,7 +136,7 @@ def check_gift_status(login: str, password: str, proxy: str, nickname: str, game
     chrome_options.add_argument('--proxy-server=%s' % proxy)
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
-    steam_login(driver, login, password)
+    steam_login(driver, login, password, shared_secret)
     time.sleep(3)
 
     steam_id = driver.current_url.split('id/')[1]
@@ -163,13 +163,13 @@ def check_gift_status(login: str, password: str, proxy: str, nickname: str, game
                 # display.stop()
                 return 'Submitted'
     driver.quit()
-    display.stop()
+    # display.stop()
     return 'Rejected'
 
 
-def main(login, password, target_name, game_link, proxy):
-    display = Display(visible=0, size=(1920, 1080))
-    display.start()
+def main(login, password, shared_secret, target_name, game_link, proxy):
+    #display = Display(visible=0, size=(1920, 1080))
+    #display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
     print('Прокси тут')
     print(proxy)
@@ -184,18 +184,18 @@ def main(login, password, target_name, game_link, proxy):
     chrome_options.add_argument('--proxy-server=%s' % proxy)
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
-    steam_login(driver, login, password)
+    steam_login(driver, login, password, shared_secret)
     time.sleep(15)
 
     gift_game(driver, game_link, target_name)
 
     driver.quit()
-    display.stop()
+    #display.stop()
 
 
-def main_friend_add(login: str, password: str, proxy: str, target_link: str):
-    display = Display(visible=0, size=(1920, 1080))
-    display.start()
+def main_friend_add(login: str, password: str, shared_secret: str, proxy: str, target_link: str):
+    #display = Display(visible=0, size=(1920, 1080))
+    #display.start()
 
     print('!!!!!!!!!!!!!!!!!!!!')
     print('Прокси тут')
@@ -211,13 +211,13 @@ def main_friend_add(login: str, password: str, proxy: str, target_link: str):
     chrome_options.add_argument('--proxy-server=%s' % proxy)
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
-    steam_login(driver, login, password)
+    steam_login(driver, login, password, shared_secret)
     time.sleep(3)
 
     add_friend(driver, target_link)
 
     driver.quit()
-    display.stop()
+    #display.stop()
 
 
 # check_gift_status('raibartinar1970', 'LHtsrneGns1976', '6772uh:WHd7M4@5.101.83.130:8000', 'enormously', 'SUPERHOT VR')
