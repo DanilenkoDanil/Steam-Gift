@@ -27,7 +27,7 @@ class Account(models.Model):
         verbose_name='Прокси'
     )
     shared_secret = models.TextField(
-        verbose_name="Shared Secret"
+        verbose_name="Shared-Secret"
     )
     balance = models.TextField(
         verbose_name='Баланс'
