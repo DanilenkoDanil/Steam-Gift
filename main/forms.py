@@ -17,8 +17,8 @@ class AccountForm(forms.ModelForm):
             'link',
             'country',
             'proxy',
+            'shared_secret',
             'balance',
-            'file'
 
         )
         widgets = {
