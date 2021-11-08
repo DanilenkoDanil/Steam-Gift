@@ -7,7 +7,7 @@ from .models import Account, Game, Shop, Order, TelegramBot, TelegramAccount, Ha
 @admin.register(Account)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'steam_login', 'steam_password', 'email', 'email_password', 'link', 'country', 'proxy',
+        'id', 'steam_login', 'steam_password', 'email', 'email_password', 'link', 'country', 'proxy', 'balance'
     )
     form = AccountForm
     search_fields = ['steam_login']
