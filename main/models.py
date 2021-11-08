@@ -27,7 +27,7 @@ class Account(models.Model):
         verbose_name='Прокси'
     )
     shared_secret = models.TextField(
-        verbose_name="Shared-Secret"
+        verbose_name="Shared Secret"
     )
     balance = models.TextField(
         verbose_name='Баланс'
@@ -76,9 +76,9 @@ class Game(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:  # this will ensure that the object is new
-            self.name = get_name.get_name_game(self.app_code)
+            self.name = get_name.get_name_game(self.sub_id)
             try:
-                self.price = game_price_check.get_price(self.app_code)
+                self.price = game_price_check.get_price(self.sub_id)
             except Exception as e:
                 print(e)
                 self.price = 0
