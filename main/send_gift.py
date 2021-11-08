@@ -68,7 +68,7 @@ def add_friend(driver, link: str):
     driver.find_element_by_xpath('/html/body/div[3]/div[3]/div/div[2]/div/span').click()
 
 
-def gift_game(driver, game_link, friend_name):
+def gift_game(driver, game_link, sub_id, friend_name):
     driver.get(game_link)
     time.sleep(3)
     try:
@@ -80,10 +80,8 @@ def gift_game(driver, game_link, friend_name):
     except NoSuchElementException:
         pass
     # Добавить в корзину
-    try:
-        driver.find_element_by_xpath("//*[contains(@href,'addToCart')]").click()
-    except NoSuchElementException:
-        driver.find_element_by_xpath("//*[contains(@href,'addBundleToCart')]").click()
+
+    driver.find_element_by_xpath(f"//*[contains(@href,'{sub_id}')]").click()
 
     time.sleep(1)
     # Купить в подарок
@@ -167,7 +165,7 @@ def check_gift_status(login: str, password: str, shared_secret: str, proxy: str,
     return 'Rejected'
 
 
-def main(login, password, shared_secret, target_name, game_link, proxy):
+def main(login, password, shared_secret, target_name, game_link, sub_id, proxy):
     display = Display(visible=0, size=(1920, 1080))
     display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
@@ -187,7 +185,7 @@ def main(login, password, shared_secret, target_name, game_link, proxy):
     steam_login(driver, login, password, shared_secret)
     time.sleep(15)
 
-    gift_game(driver, game_link, target_name)
+    gift_game(driver, game_link, sub_id, target_name)
 
     driver.quit()
     display.stop()
