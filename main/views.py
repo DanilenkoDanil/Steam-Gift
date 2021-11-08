@@ -118,7 +118,7 @@ def send_gift_to_user(login, order_code, task_name):
     target_name = get_name.get_name(order.user_link)
     game_link = f'https://store.steampowered.com/app/{order.game.app_code}'
     try:
-        send_gift.main(bot.steam_login, bot.steam_password, bot.shared_secret, target_name, game_link, bot.proxy)
+        send_gift.main(bot.steam_login, bot.steam_password, bot.shared_secret, target_name, game_link, order.game.sub_id, bot.proxy)
         order.status = 'Gift Sent'
         order.save()
         check_gift_status(login, target_name, order_code, 'Check Gift Status', schedule=120)
