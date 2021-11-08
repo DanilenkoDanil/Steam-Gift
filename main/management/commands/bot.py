@@ -1,9 +1,19 @@
 from django.core.management.base import BaseCommand
-from main.models import Game, TelegramAccount, TelegramBot
+from main.models import Game, TelegramAccount, TelegramBot, Account
 import requests
 import json
 import time
 import telebot
+import codecs
+from steampy.client import SteamClient, GameOptions
+from steampy.market import Currency
+from steampy.exceptions import ApiException
+
+
+def get_balance(login, password, key):
+    file = {'shared_secret': key}
+    with SteamClient('E753335BD1F5A4BB0247D27C6D4A8A68', login, password,  json.dumps(file)) as steam_client:
+        return steam_client.get_wallet_balance()
 
 
 def get_telegram_token(name: str) -> TelegramBot:
@@ -24,24 +34,27 @@ def send_message(message, token, users):
             print(e)
 
 
-def get_price(app_id):
-    url = "http://store.steampowered.com/api/appdetails/?appids={}".format(app_id)
-    response = requests.get(url)
-    j = response.json()
-
-    pre_final_price = j["{}".format(app_id)]["data"]["price_overview"]["final"]
-    final_price = float(pre_final_price) / 100
-
-    return final_price
+def get_price(sub_id):
+    link = f'http://store.steampowered.com/api/packagedetails?packageids={sub_id}'
+    res = requests.get(link)
+    result_dict = json.loads(res.content.decode('utf-8'))
+    try:
+        return int(result_dict[str(sub_id)]['data']['price']['final'])/100
+    except KeyError:
+        return 0
 
 
 def scan_all():
+    counter = 1
     for i in list(Game.objects.all()):
-        print(i.app_code)
+        if counter % 100 == 0:
+            time.sleep(300)
+        counter += 1
+        print(i.sub_id)
         time.sleep(2)
         base_price = i.price
         try:
-            current_price = get_price(i.app_code)
+            current_price = get_price(i.sub_id)
         except Exception as e:
             print(e)
             continue
@@ -57,6 +70,15 @@ def scan_all():
             send_message(message, token, users)
             i.price = current_price
             i.save()
+
+    for i in list(Account.objects.all()):
+        print(i.steam_login)
+        try:
+            balance = get_balance(i.steam_login, i.steam_password, i.shared_secret)
+            i.balance = balance
+            i.save()
+        except Exception as e:
+            print(e)
 
 
 class Command(BaseCommand):
