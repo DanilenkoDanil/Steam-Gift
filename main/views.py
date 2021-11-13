@@ -24,8 +24,8 @@ def send_message(message, token, users):
     bot = telebot.TeleBot(token.replace(" ", ""))
     for i in users:
         print(f"{i.user_id} - send")
-
         bot.send_message(i.user_id, message)
+        print("Yes")
 
 @background
 def add_friend(login, target_link, order_id, task_name):
