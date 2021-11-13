@@ -164,6 +164,7 @@ def check_gift_status(login: str, password: str, shared_secret: str, proxy: str,
 
 
 def main(login, password, shared_secret, target_name, game_link, sub_id, proxy):
+    timer = time.time()
     display = Display(visible=0, size=(1920, 1080))
     display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
@@ -181,10 +182,12 @@ def main(login, password, shared_secret, target_name, game_link, sub_id, proxy):
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
     steam_login(driver, login, password, shared_secret)
-    time.sleep(15)
+    time.sleep(3)
 
     gift_game(driver, game_link, sub_id, target_name)
-
+    
+    print(f"Время отправки - {round(time.time() - timer, 2)}")
+    
     driver.quit()
     display.stop()
 
