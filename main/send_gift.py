@@ -17,7 +17,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 def steam_login(driver, login: str, password: str, shared_secret):
     driver.get('https://steamcommunity.com/')
     driver.find_element_by_xpath('//*[@id="global_action_menu"]/a').click()
-    time.sleep(10)
     login_input = driver.find_element_by_xpath('//*[@id="input_username"]')
     for i in login:
         login_input.send_keys(i)
@@ -39,7 +38,7 @@ def steam_login(driver, login: str, password: str, shared_secret):
         code_input.send_keys(i)
         time.sleep(random.uniform(0, 0.2))
     driver.find_element_by_xpath('//*[@id="login_twofactorauth_buttonset_entercode"]/div[1]').click()
-    time.sleep(10)
+    # time.sleep(10)
     print('LOGIIIIIIINNNNNNNNNN')
     try:
         code_input = driver.find_element_by_xpath('//*[@id="twofactorcode_entry"]')
