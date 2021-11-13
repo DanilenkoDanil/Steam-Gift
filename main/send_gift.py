@@ -16,7 +16,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 def steam_login(driver, login: str, password: str, shared_secret):
     driver.get('https://steamcommunity.com/')
-    time.sleep(10)
     driver.find_element_by_xpath('//*[@id="global_action_menu"]/a').click()
     time.sleep(10)
     login_input = driver.find_element_by_xpath('//*[@id="input_username"]')
