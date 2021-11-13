@@ -24,11 +24,8 @@ def send_message(message, token, users):
     bot = telebot.TeleBot(token.replace(" ", ""))
     for i in users:
         print(f"{i.user_id} - send")
-        try:
-            bot.send_message(i.user_id, message)
-        except Exception as e:
-            print(e)
 
+        bot.send_message(i.user_id, message)
 
 @background
 def add_friend(login, target_link, order_id, task_name):
