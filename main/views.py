@@ -21,8 +21,10 @@ def get_shops() -> Shop:
 
 
 def send_message(message, token, users):
+    
     print(token)
-    bot = telebot.TeleBot(token.replace(" ", ""))
+    bot = telebot.TeleBot(token)
+    bot.config['api_key'] = token
     for i in users:
         print(f"{i.user_id} - send")
         print(bot.send_message(i.user_id, message))
