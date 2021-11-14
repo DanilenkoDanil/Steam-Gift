@@ -104,7 +104,8 @@ class Order(models.Model):
     )
 
     sell_code = models.TextField(
-        verbose_name='Код продажи'
+        verbose_name='Код продажи',
+        unique=True
     )
     game = models.ForeignKey(
         to='main.Game',
