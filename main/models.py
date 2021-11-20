@@ -158,12 +158,12 @@ class Order(models.Model):
         if self.tracker.has_changed('status'):
             print(self.status)
             if self.status == 'Add to Friends':
-                add_friend(self.bot.steam_login, self.user_link, self.sell_code, "Add Friend")
+                add_friend(self.bot.steam_login, self.user_link, self.sell_code, "Add Friend", schedule=120)
             elif self.status == 'Sending Gift':
-                send_gift_to_user(self.bot.steam_login, self.sell_code, "Sending Gift")
+                send_gift_to_user(self.bot.steam_login, self.sell_code, "Sending Gift", schedule=120)
             elif self.status == 'Add to Friends':
                 check_gift_status(self.bot.steam_login, get_name.get_name(self.user_link), self.sell_code,
-                                  "Check Gift Status")
+                                  "Check Gift Status", schedule=120)
         super().save(*args, **kwargs)
 
 
