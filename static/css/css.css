@@ -1,0 +1,138 @@
+{% load static %}
+
+a{
+    text-decoration: None;
+}
+
+body{
+
+    background-image: url(../img/background.png);
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+.top{
+    position: relative;
+    display: block;
+    margin-top: 5%; 
+}
+
+.top img{
+    z-index: 0;
+    width: 100%;
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+.text{
+    position: absolute;
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    font-size: 2.1vw;
+    font-weight: 700;
+    color: #FFFFFF;
+    z-index: 1;
+    bottom: 70%;
+    width: 37%;
+    left: 31.6%;
+}
+
+.game{
+    position: absolute;
+    left: 15%;
+    top:30%;
+    display:flex;
+    border-radius: 25px;
+    width: 29%
+}
+
+
+.lang{
+    position: absolute;
+    left: 75%;
+    font-weight: 700;
+    top: 8%;
+    color: #979a9a;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.1vw;
+    cursor: pointer;
+}
+
+.active{
+    color: #FFFFFF;
+}
+
+.description{
+    position: absolute;
+    top: 28%;
+    right: 20%;
+    float:right;
+    width: 30%;
+    margin-right: 5%;
+    color: #FFFFFF;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9vw;
+    line-height: 1.3vw;
+}
+.description p{
+    color:#979a9a;
+}
+.description span{
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.main__status{
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    font-size: 1vw;
+    width: 100%;
+    height: 15%;
+    padding: 5% 5%;
+    background-color: #5193E0;
+    border-radius: 8px;
+}
+.vector{
+    position: absolute;
+    width: 25%;
+    height: 10%;
+    top: 2%;
+    left: 5%;
+}
+
+.contacts{
+    position: relative;
+    width:100%;
+    height:5%;
+    margin-top: 10%;
+}
+
+.contacts_text{
+    display: inline-block;
+    position: absolute;
+    width:30%;
+    height:100%;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4vw;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0% 6% 0% 0%;
+}
+
+.con_img1{
+    margin-left: 35%;
+}
+
+.contacts img{
+    width: 5%; 
+    height: 5%;
+    margin-right: 4%;
+}
+
+.en_lang {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
