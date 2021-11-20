@@ -1,22 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-	{% load static %}
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <title>Document</title>
-
-</head>
-<body>
-
-    <section class="main container">
-        <div class="language">
-            <button onclick="functionRu()" class="language__item active" id="ru_button">RU</button>
-            <button onclick="functionEn()" class="language__item" id="en_button">EN</button>
-            <script>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/css.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;700&family=Ubuntu:wght@300&display=swap" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>
                 function functionEn(){
                 var rusLang = document.getElementsByClassName("rus_lang");
                 var enLang = document.getElementsByClassName("en_lang");
@@ -44,50 +33,47 @@
 
 
             </script>
+    </head>
+    <body>
+        <div class='top'>
+            <img src="{% static 'img/Vector.png' %}">
+            <div class="text">
+                <span>{{ game_name }}</span>
+            </div>
         </div>
-        <div class="main__item">
-            <div class="main__img">
-                <img src="{{ image_link }}" alt="{{ game_name }}">
+            <div class='lang'>
+            <p><span id="ru_button" onclick="functionRu()" class="active">Ru </span><span id="en_button" onclick="functionEn()">En</span></p>
             </div>
 
-            <div class="main__text">
-                <h1 class="main__title">{{ game_name }}</h1>
-
+            <img src="{{ image_link }}" class="game">
+        <div class="description">
+                <img src="{% static 'img/Vector123.png' %}" class='vector'>
+                <h2 class="rus_lang">Описание:</h2>
+                <h2 class="en_lang">Description:</h2>
                 <div class="rus_lang">{{ description_ru|linebreaksbr }}</div>
                 <div class="en_lang">{{ description_eng|linebreaksbr }}</div>
 
-                <div class="main__text_bot">
-                    <p class="rus_lang">Регион аккаунта: {{ region }}</p>
-                    <p class="en_lang"> Account region: {{ region }}</p>
-                    <p class="rus_lang">Steam профиль: <a href="{{ user_link }}" target="_blank">Ссылка</a></p>
-                    <p class="en_lang">Steam profile: <a href="{{ user_link }}" target="_blank">Link</a></p>
-                    <p class="rus_lang">Уникальный код товара: {{ code }}</p>
-                    <p class="en_lang">Unique product code: {{ code }}</p>
-                </div>
-
-                <div class="main__status">
-                    <span><strong>Подарок успешно отправлен на ваш аккаунт</strong></span>
-                </div>
-
-                <div class="main__social">
-                    <h2 class="main__social-title rus_lang">Контактные данные продавца</h2>
-                    <h2 class="main__social-title en_lang">Seller contact details</h2>
-
-                    <div class="main__social-wrapper">
-                        <a class="main__social_link" href="{{skype_link}}" target="_blank">
-                            <img src="{% static 'img/premium-icon-skype-3128338.png' %}" alt="">
-                            <p>Open</p>
-                        </a>
-                        <a class="main__social_link" href="{{shop_link}}" target="_blank">
-                            <img src="{% static 'img/free-icon-pay-per-click-637922.png' %}" alt="">
-                            <p>Open</p>
-                        </a>
-                    </div>
-
-                </div>
+                <p><span class="rus_lang">Регион аккаунта: {{ region }}<br></span>
+                <span class="en_lang"> Account region:  {{ region }}<br></span>
+                <span class="rus_lang">Steam профиль:  <a href="{{ user_link }}" target="_blank">Ссылка</a><br></span>
+                <span class="en_lang">Steam profile: <a href="{{ user_link }}" target="_blank">Link</a><br></span>
+                <span class="rus_lang">Уникальный код товара: {{ code }}<br></span>
+                <span class="en_lang">Unique product code: {{ code }}</span></p>
+        
+            <div class="main__status">
+                <span>Заявка в друзья принята, отправляем ваш подарок</span>
+            </div>
+            
+            <div class='contacts'>
+                <div class='contacts_text'><span class="rus_lang">Контакты</span> <span class="en_lang">Contacts</span> </div>
+                    <img src="{% static 'img/tg.png' %}" class='con_img1'>
+                    <img src="{% static 'img/vk.png' %}">
+                    <img src="{% static 'img/Subtract.png' %}">
+                    <img src="{% static 'img/skype.png' %}">
+                    <img src="{% static 'img/wp.png' %}">
             </div>
         </div>
-     <script>
+    <script>
 
 let data = {
 	sell_code: "{{ code }}"
@@ -185,6 +171,5 @@ function getAccount() {
 	getAccount()
 
 	</script>
-    </section>
-</body>
+    </body>
 </html>
