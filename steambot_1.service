@@ -1,0 +1,14 @@
+[Unit]
+Description=Steam Bot
+After=network.target
+
+[Service]
+User=bot
+Group=bot
+
+WorkingDirectory=/home/bot/Steam-Gift/
+Environment="PYTHONPATH=/home/bot/Steam-Gift/"
+ExecStart=/home/bot/Steam-Gift/venv/bin/python /home/bot/Steam-Gift/manage.py process_tasks
+
+[Install]
+WantedBy=multi-user.target
