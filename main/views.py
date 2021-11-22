@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views import View
 from background_task import background
+from background_task.models import Task
 
 from main.models import Account, Game, Shop, Order, TelegramAccount, TelegramBot, Handmade, Status
 
@@ -21,43 +22,27 @@ def get_shops() -> Shop:
 
 
 def send_message(message, token, users):
-    
-    print(token)
     bot = telebot.TeleBot(token)
     bot.config['api_key'] = token
     for i in users:
         print(f"{i.user_id} - send")
-        print(bot.send_message(i.user_id, message))
-        print("Yes")
+        try:
+            bot.send_message(i.user_id, message)
+        except Exception as e:
+            print(e)
+
 
 @background
 def add_friend(login, target_link, order_id, task_name):
     print(task_name)
     order = get_order_by_sell_code(order_id)
     bot = get_user_by_login(login)
-    try:
-        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_link)
+
+    if send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_link) != 'Error':
         order.status = 'Accept Request'
         order.save()
         check_friends_list(login, order_id, bot.link, target_link, 'Check friends')
-    except Exception as e:
-        print(e)
-        order.status = 'Add Friend Error'
-        order.save()
-
-
-@background
-def remove_friend(login, target_link, order_id, task_name):
-    print(task_name)
-    order = get_order_by_sell_code(order_id)
-    bot = get_user_by_login(login)
-    try:
-        send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_link)
-        order.status = 'Accept Request'
-        order.save()
-        check_friends_list(login, order_id, bot.link, target_link, 'Check friends')
-    except Exception as e:
-        print(e)
+    else:
         order.status = 'Add Friend Error'
         order.save()
 
@@ -70,44 +55,43 @@ def check_gift_status(login, target_name, order_id, task_name):
     order.save()
     bot = get_user_by_login(login)
     game_name = order.game.name
-    try:
-        if order.check_count < 6:
-            status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_name, game_name)
-            if status == 'Submitted':
-                order.status = 'Gift Sent'
-                order.save()
-                check_gift_status(login, target_name, order_id, task_name, schedule=1200)
-            elif status == 'Received':
-                order.status = 'Gift Received'
-                order.save()
 
-                message = f"""Гифт принят!
-                Код - {order_id}
-                {order.game.name} - {target_name}"""
+    if order.check_count < 6:
+        status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_name, game_name)
+        if status == 'Submitted':
+            order.status = 'Gift Sent'
+            order.save()
+            check_gift_status(login, target_name, order_id, task_name, schedule=1200)
+        elif status == 'Received':
+            order.status = 'Gift Received'
+            order.save()
 
-                token = get_telegram_token('info').key
-                users = get_telegram_users()
+            message = f"""Гифт принят!
+            Код - {order_id}
+            {order.game.name} - {target_name}"""
 
-                send_message(message, token, users)
+            token = get_telegram_token('info').key
+            users = get_telegram_users()
 
-            elif status == 'Rejected':
-                order.status = 'Gift Rejected'
-                order.save()
+            send_message(message, token, users)
 
-                message = f"""Гифт Отклонён!
-                Код - {order_id}
-                {order.game.name} - {target_name}"""
+        elif status == 'Rejected':
+            order.status = 'Gift Rejected'
+            order.save()
 
-                token = get_telegram_token('info').key
-                users = get_telegram_users()
+            message = f"""Гифт Отклонён!
+            Код - {order_id}
+            {order.game.name} - {target_name}"""
 
-                send_message(message, token, users)
-        else:
-            print('Слишком много проверок, статус больше не обновляеться')
-    except Exception as e:
-        print(e)
-        order.status = 'Check Error'
-        order.save()
+            token = get_telegram_token('info').key
+            users = get_telegram_users()
+
+            send_message(message, token, users)
+        elif status == 'Error':
+            order.status = 'Check Error'
+            order.save()
+    else:
+        print('Слишком много проверок, статус больше не обновляеться')
 
 
 @background
@@ -117,14 +101,12 @@ def send_gift_to_user(login, order_code, task_name):
     order = get_order_by_sell_code(order_code)
     target_name = get_name.get_name(order.user_link)
     game_link = f'https://store.steampowered.com/app/{order.game.app_code}'
-    try:
-        send_gift.main(bot.steam_login, bot.steam_password, bot.shared_secret, target_name, game_link, order.game.sub_id, bot.proxy)
+    result = send_gift.main(bot.steam_login, bot.steam_password, bot.shared_secret, target_name, game_link, order.game.sub_id, bot.proxy, order.user_link)
+    if result is None or result == "Error Remove":
         order.status = 'Gift Sent'
         order.save()
         check_gift_status(login, target_name, order_code, 'Check Gift Status', schedule=120)
-    except Exception as e:
-        print(e)
-
+    elif result == "Error":
         order.status = 'Send Gift Error'
         order.save()
 
@@ -138,7 +120,7 @@ def send_gift_to_user(login, order_code, task_name):
         send_message(message, token, users)
 
 
-@background(schedule=30)
+@background(schedule=60)
 def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
     print(task_name)
     print('!!!!!!!!!!!!!!!!!!!!!1111111111111111111111111111')
@@ -146,19 +128,41 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
     print(bot_link)
     print(user_link)
     order = get_order_by_sell_code(order_code)
+    order.check_count += 1
+    order.save()
     print('!!!!!!!!!!!!!!!!!!!!!')
-    try:
+    if order.check_count < 6:
         result = get_friends.check_friends(bot_link, user_link)
         if result:
             print("Бот в друзьях")
             order.status = 'Sending Gift'
+            order.check_count = 0
             order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
             check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
-    except Exception as e:
-        print(e)
-        check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
+    elif order.check_count < 12:
+        result = get_friends.check_friends(bot_link, user_link)
+        if result:
+            print("Бот в друзьях")
+            order.status = 'Sending Gift'
+            order.check_count = 0
+            order.save()
+            send_gift_to_user(bot_login, order_code, 'Send Gift')
+        else:
+            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=300)
+    elif order.check_count < 20:
+        result = get_friends.check_friends(bot_link, user_link)
+        if result:
+            print("Бот в друзьях")
+            order.status = 'Sending Gift'
+            order.check_count = 0
+            order.save()
+            send_gift_to_user(bot_login, order_code, 'Send Gift')
+        else:
+            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=600)
+    else:
+        print('Проверок больше не будет')
 
 
 @background(schedule=2)
@@ -170,18 +174,15 @@ def check_friends_list_first(bot_login, order_code, bot_link, user_link, task_na
     print(user_link)
     order = get_order_by_sell_code(order_code)
     print('!!!!!!!!!!!!!!!!!!!!!')
-    try:
-        result = get_friends.check_friends(bot_link, user_link)
-        if result:
-            print("Бот в друзьях")
-            order.status = 'Sending Gift'
-            order.save()
-            send_gift_to_user(bot_login, order_code, 'Send Gift')
-        else:
-            add_friend(bot_login, user_link, order_code, 'Add to Friends')
-    except Exception as e:
-        print(e)
-        check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
+
+    result = get_friends.check_friends(bot_link, user_link)
+    if result:
+        print("Бот в друзьях")
+        order.status = 'Sending Gift'
+        order.save()
+        send_gift_to_user(bot_login, order_code, 'Send Gift')
+    else:
+        add_friend(bot_login, user_link, order_code, 'Add to Friends')
 
 
 class DynamicStatusLoad(View):
@@ -215,8 +216,23 @@ def get_user_by_login(login: str) -> Account:
     return Account.objects.filter(steam_login=login)[0]
 
 
-def get_user_by_country(country: str) -> Account:
-    return Account.objects.filter(country=country)[0]
+def get_user_by_country(country: str, price: str) -> Account:
+    print(price)
+    account_list = list(Account.objects.filter(country=country, balance__gt=float(price)))
+    print(len(account_list))
+    if len(account_list) == 0:
+        message = f"""Недостаточно средств в регионе {country}!
+Нет не одного аккаунта с балансом больше {price}. Последний гифт не отправлен!"""
+        token = get_telegram_token('info').key
+        users = get_telegram_users()
+
+        send_message(message, token, users)
+        return random.choice(list(Account.objects.filter(country=country)))
+    for account in account_list:
+        if len(Task.objects.filter(task_params__contains=account.steam_login)) == 0:
+            print(account.balance)
+            return account
+    return random.choice(account_list)
 
 
 def get_user_by_id(number: str) -> Account:
@@ -284,7 +300,7 @@ def index(request):
                     account = get_user_by_id(bot_account_code)
                 else:
                     country = info['options'][1]['value']
-                    account = get_user_by_country(country)
+                    account = get_user_by_country(country, game.price)
 
                 image_link = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{game_code}/header.jpg"
                 game_link = f'https://store.steampowered.com/app/{game_code}'
