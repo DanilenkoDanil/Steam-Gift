@@ -38,7 +38,6 @@ def steam_login(driver, login: str, password: str, shared_secret):
         code_input.send_keys(i)
         time.sleep(random.uniform(0, 0.2))
     driver.find_element_by_xpath('//*[@id="login_twofactorauth_buttonset_entercode"]/div[1]').click()
-    # time.sleep(10)
     print('LOGIIIIIIINNNNNNNNNN')
     try:
         code_input = driver.find_element_by_xpath('//*[@id="twofactorcode_entry"]')
@@ -64,6 +63,18 @@ def add_friend(driver, link: str):
     driver.find_element_by_xpath('//*[@id="btn_add_friend"]/span').click()
     time.sleep(1)
     driver.find_element_by_xpath('/html/body/div[3]/div[3]/div/div[2]/div/span').click()
+
+
+def remove_friend(driver, link: str):
+    driver.get(link)
+    time.sleep(1)
+    driver.find_element_by_xpath('//*[@id="profile_action_dropdown_link"]/span').click()
+    time.sleep(1)
+    driver.find_element_by_xpath('//*[@id="profile_action_dropdown"]/div[9]/a[6]').click()
+    time.sleep(1)
+    driver.find_element_by_xpath('/html/body/div[3]/div[3]/div/div[2]/div[1]/span').click()
+    time.sleep(1)
+    driver.find_element_by_xpath('/html/body/div[4]/div[3]/div/div[2]/div/span').click()
 
 
 def gift_game(driver, game_link, sub_id, friend_name):
@@ -129,42 +140,46 @@ def check_gift_status(login: str, password: str, shared_secret: str, proxy: str,
     #     }
     # }
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     chrome_options.add_argument('--proxy-server=%s' % proxy)
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
+    try:
+        steam_login(driver, login, password, shared_secret)
+        time.sleep(3)
 
-    steam_login(driver, login, password, shared_secret)
-    time.sleep(3)
-
-    steam_id = driver.current_url.split('id/')[1]
-    driver.get(f'https://steamcommunity.com/id/{steam_id}/inventory/')
-    time.sleep(6)
-    driver.find_element_by_xpath('//*[@id="inventory_more_link"]').click()
-    time.sleep(4)
-    driver.find_element_by_xpath('//*[@id="inventory_more_dropdown"]/div/a[3]').click()
-    time.sleep(6)
-    gifts = driver.find_element_by_xpath('//*[@id="tabcontent_pendinggifts"]').find_elements_by_tag_name('div')
-    for i in gifts:
-        try:
-            status_area = i.find_element_by_class_name('gift_status_area')
-        except NoSuchElementException:
-            continue
-        print(status_area.text)
-        if nickname in status_area.find_element_by_tag_name('a').text and game_name in i.text:
-            if 'Redeemed' in i.text:
-                driver.quit()
-                # display.stop()
-                return 'Received'
-            elif 'Sent' in i.text:
-                driver.quit()
-                # display.stop()
-                return 'Submitted'
+        steam_id = driver.current_url.split('id/')[1]
+        driver.get(f'https://steamcommunity.com/id/{steam_id}/inventory/')
+        time.sleep(3)
+        driver.find_element_by_xpath('//*[@id="inventory_more_link"]').click()
+        time.sleep(0.5)
+        driver.find_element_by_xpath('//*[@id="inventory_more_dropdown"]/div/a[3]').click()
+        gifts = driver.find_element_by_xpath('//*[@id="tabcontent_pendinggifts"]').find_elements_by_tag_name('div')
+        for i in gifts:
+            try:
+                status_area = i.find_element_by_class_name('gift_status_area')
+            except NoSuchElementException:
+                continue
+            print(status_area.text)
+            if nickname in status_area.find_element_by_tag_name('a').text and game_name in i.text:
+                if 'Redeemed' in i.text:
+                    driver.quit()
+                    # display.stop()
+                    return 'Received'
+                elif 'Sent' in i.text:
+                    driver.quit()
+                    # display.stop()
+                    return 'Submitted'
+    except Exception as e:
+        print(e)
+        driver.quit()
+        display.stop()
+        return 'Error'
     driver.quit()
     display.stop()
     return 'Rejected'
 
 
-def main(login, password, shared_secret, target_name, game_link, sub_id, proxy):
-    timer = time.time()
+def main(login, password, shared_secret, target_name, game_link, sub_id, proxy, target_link):
     display = Display(visible=0, size=(1920, 1080))
     display.start()
     print('!!!!!!!!!!!!!!!!!!!!')
@@ -178,16 +193,25 @@ def main(login, password, shared_secret, target_name, game_link, sub_id, proxy):
     #     }
     # }
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     chrome_options.add_argument('--proxy-server=%s' % proxy)
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
-
-    steam_login(driver, login, password, shared_secret)
-    time.sleep(3)
-
-    gift_game(driver, game_link, sub_id, target_name)
-    
-    print(f"Время отправки - {round(time.time() - timer, 2)}")
-    
+    try:
+        steam_login(driver, login, password, shared_secret)
+        time.sleep(3)
+        gift_game(driver, game_link, sub_id, target_name)
+        try:
+            remove_friend(driver, target_link)
+        except Exception as e:
+            print(e)
+            driver.quit()
+            display.stop()
+            return 'Error Remove'
+    except Exception as e:
+        print(e)
+        driver.quit()
+        display.stop()
+        return 'Error'
     driver.quit()
     display.stop()
 
@@ -207,17 +231,22 @@ def main_friend_add(login: str, password: str, shared_secret: str, proxy: str, t
     #     }
     # }
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     chrome_options.add_argument('--proxy-server=%s' % proxy)
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), chrome_options=chrome_options)
 
-    steam_login(driver, login, password, shared_secret)
-    time.sleep(3)
-
-    add_friend(driver, target_link)
+    try:
+        steam_login(driver, login, password, shared_secret)
+        time.sleep(3)
+        add_friend(driver, target_link)
+    except Exception as e:
+        print(e)
+        driver.quit()
+        display.stop()
+        return 'Error'
 
     driver.quit()
     display.stop()
-
 
 # check_gift_status('raibartinar1970', 'LHtsrneGns1976', '6772uh:WHd7M4@5.101.83.130:8000', 'enormously', 'SUPERHOT VR')
 
