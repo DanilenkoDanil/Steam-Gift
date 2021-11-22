@@ -26,6 +26,7 @@ def get_telegram_users() -> TelegramAccount:
 
 def send_message(message, token, users):
     bot = telebot.TeleBot(token)
+    bot.config['api_key'] = token
     for i in users:
         print(f"{i.user_id} - send")
         try:
