@@ -107,6 +107,7 @@ class Order(models.Model):
         ('Gift Received', 'Gift Received'),
         ('Gift Sent', 'Gift Sent'),
         ('Accept Request', 'Accept Request'),
+        ('Bot Wait', 'Bot Wait')
     )
 
     sell_code = models.TextField(
