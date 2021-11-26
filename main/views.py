@@ -23,13 +23,26 @@ def get_shops() -> Shop:
 
 def send_message(message, token, users):
     bot = telebot.TeleBot(token)
-    bot.config['api_key'] = token
     for i in users:
         print(f"{i.user_id} - send")
         try:
             bot.send_message(i.user_id, message)
         except Exception as e:
             print(e)
+
+
+@background(schedule=20)
+def check_bots(order_id, task_name):
+    print(task_name)
+    order = get_order_by_sell_code(order_id)
+    account = get_user_by_country('Россия', order.game.price)
+    if account != 0:
+        order.account = account,
+        order.status = "Add to Friends"
+        order.save()
+        check_friends_list_first(account.steam_login, order_id, account.link, order.user_link, "First Check")
+    else:
+        check_bots(order_id, task_name)
 
 
 @background
@@ -229,10 +242,11 @@ def get_user_by_country(country: str, price: str) -> Account:
         send_message(message, token, users)
         return random.choice(list(Account.objects.filter(country=country)))
     for account in account_list:
-        if len(Task.objects.filter(task_params__contains=account.steam_login)) == 0:
+        if len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='Add to Friends')) == 0 and \
+        len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='Sending Gift')) == 0:
             print(account.balance)
             return account
-    return random.choice(account_list)
+    return 0
 
 
 def get_user_by_id(number: str) -> Account:
@@ -288,6 +302,8 @@ def index(request):
                 gift_sent_ru = get_status('Gift Sent', 'ru')
                 accept_request_ru = get_status('Accept Request', 'ru')
                 accept_request_en = get_status('Accept Request', 'eng')
+                bot_wait_ru = get_status('Bot Wait', 'ru')
+                bot_wait_en = get_status('Bot Wait', 'eng')
 
                 game = get_game(info['id_goods'])
                 game_code = game.app_code
@@ -306,12 +322,18 @@ def index(request):
                 game_link = f'https://store.steampowered.com/app/{game_code}'
 
                 user_link = info['options'][0]['value']
+                if account != 0:
+                    order = Order(sell_code=code, bot=account, game=game, user_link=user_link, status='Add to Friends',
+                                  country=country, skype_link=i.skype_link, shop_link=i.shop_link, check_count=0)
+                    order.save()
 
-                order = Order(sell_code=code, bot=account, game=game, user_link=user_link, status='Add to Friends',
-                              country=country, skype_link=i.skype_link, shop_link=i.shop_link, check_count=0)
-                order.save()
-
-                check_friends_list_first(account.steam_login, code, account.link, user_link, 'First Check')
+                    check_friends_list_first(account.steam_login, code, account.link, user_link, 'First Check')
+                else:
+                    account = get_user_by_login('.')
+                    order = Order(sell_code=code, bot=account, game=game, user_link=user_link, status='Bot Wait',
+                                  country=country, skype_link=i.skype_link, shop_link=i.shop_link, check_count=0)
+                    order.save()
+                    check_bots(code, 'Queue')
 
                 message = f"""Новая покупка!
 Код - {code}
@@ -352,6 +374,8 @@ def index(request):
                                'gift_received_ru': gift_received_ru.text,
                                'gift_sent_en': gift_sent_en.text,
                                'gift_sent_ru': gift_sent_ru.text,
+                               'bot_wait_ru': bot_wait_ru.text,
+                               'bot_wait_en': bot_wait_en.text
                                })
             else:
                 continue
@@ -378,6 +402,8 @@ def index(request):
         gift_sent_ru = get_status('Gift Sent', 'ru')
         accept_request_ru = get_status('Accept Request', 'ru')
         accept_request_en = get_status('Accept Request', 'eng')
+        bot_wait_ru = get_status('Bot Wait', 'ru')
+        bot_wait_en = get_status('Bot Wait', 'eng')
 
         game_code = order.game.app_code
         image_link = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{game_code}/header.jpg"
@@ -413,6 +439,8 @@ def index(request):
                        'gift_received_ru': gift_received_ru.text,
                        'gift_sent_en': gift_sent_en.text,
                        'gift_sent_ru': gift_sent_ru.text,
+                       'bot_wait_ru': bot_wait_ru.text,
+                       'bot_wait_en': bot_wait_en.text
                        })
 
 
