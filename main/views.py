@@ -243,7 +243,7 @@ def get_user_by_country(country: str, price: str) -> Account:
         send_message(message, token, users)
         return random.choice(list(Account.objects.filter(country=country)))
     for account in account_list:
-        if len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='Add to Friends')) == 0 and \
+        if len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='First Check')) == 0 and len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='Add to Friends')) == 0 and \
         len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='Sending Gift')) == 0:
             print(account.balance)
             return account
