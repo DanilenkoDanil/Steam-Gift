@@ -23,7 +23,6 @@ def get_shops() -> Shop:
 
 def send_message(message, token, users):
     bot = telebot.TeleBot(token)
-    bot.config['api_key'] = token
     for i in users:
         print(f"{i.user_id} - send")
         try:
@@ -145,7 +144,7 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
     order.check_count += 1
     order.save()
     print('!!!!!!!!!!!!!!!!!!!!!')
-    if order.check_count < 6:
+    if order.check_count < 3:
         result = get_friends.check_friends(bot_link, user_link)
         if result:
             print("Бот в друзьях")
@@ -154,17 +153,7 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
             order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
-    elif order.check_count < 12:
-        result = get_friends.check_friends(bot_link, user_link)
-        if result:
-            print("Бот в друзьях")
-            order.status = 'Sending Gift'
-            order.check_count = 0
-            order.save()
-            send_gift_to_user(bot_login, order_code, 'Send Gift')
-        else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=300)
+            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=60)
     elif order.check_count < 20:
         result = get_friends.check_friends(bot_link, user_link)
         if result:
@@ -174,8 +163,10 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
             order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=600)
+            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=180)
     else:
+        order.status = "Bot Stop"
+        order.save()
         print('Проверок больше не будет')
 
 
@@ -243,9 +234,7 @@ def get_user_by_country(country: str, price: str) -> Account:
         send_message(message, token, users)
         return random.choice(list(Account.objects.filter(country=country)))
     for account in account_list:
-        if len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='First Check')) == 0 and len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='Add to Friends')) == 0 and \
-        len(Task.objects.filter(task_params__contains=account.steam_login).filter(task_params__contains='Sending Gift')) == 0:
-            print(account.balance)
+        if len(Task.objects.filter(task_params__contains=account.steam_login)) == 0:
             return account
     return 0
 
@@ -305,6 +294,8 @@ def index(request):
                 accept_request_en = get_status('Accept Request', 'eng')
                 bot_wait_ru = get_status('Bot Wait', 'ru')
                 bot_wait_en = get_status('Bot Wait', 'eng')
+                bot_stop_ru = get_status('Bot Stop', 'ru')
+                bot_stop_en = get_status('Bot Stop', 'eng')
 
                 game = get_game(info['id_goods'])
                 game_code = game.app_code
@@ -376,7 +367,9 @@ def index(request):
                                'gift_sent_en': gift_sent_en.text,
                                'gift_sent_ru': gift_sent_ru.text,
                                'bot_wait_ru': bot_wait_ru.text,
-                               'bot_wait_en': bot_wait_en.text
+                               'bot_wait_en': bot_wait_en.text,
+                               'bot_stop_ru': bot_stop_ru.text,
+                               'bot_stop_en': bot_stop_en.text
                                })
             else:
                 continue
@@ -405,6 +398,8 @@ def index(request):
         accept_request_en = get_status('Accept Request', 'eng')
         bot_wait_ru = get_status('Bot Wait', 'ru')
         bot_wait_en = get_status('Bot Wait', 'eng')
+        bot_stop_ru = get_status('Bot Stop', 'ru')
+        bot_stop_en = get_status('Bot Stop', 'eng')
 
         game_code = order.game.app_code
         image_link = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{game_code}/header.jpg"
@@ -441,7 +436,9 @@ def index(request):
                        'gift_sent_en': gift_sent_en.text,
                        'gift_sent_ru': gift_sent_ru.text,
                        'bot_wait_ru': bot_wait_ru.text,
-                       'bot_wait_en': bot_wait_en.text
+                       'bot_wait_en': bot_wait_en.text,
+                       'bot_stop_ru': bot_stop_ru.text,
+                       'bot_stop_en': bot_stop_en.text
                        })
 
 
