@@ -333,8 +333,9 @@ def index(request):
 
                 token = get_telegram_token('info').key
                 users = get_telegram_users()
-
-                send_message(message, token, users)
+                
+                # Временно отключено
+                # send_message(message, token, users)
 
                 return render(request, 'main/account.html',
                               {'game_name': game.name,
