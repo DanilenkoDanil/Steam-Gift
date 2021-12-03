@@ -159,6 +159,11 @@ function getAccount() {
 						    "<span class='rus_lang'><strong>{{ bot_wait_ru }}</strong></span><span class='en_lang'><strong>{{ bot_wait_en }}</strong></span>"
 
 						);
+					} else if (status == 'Bot Stop') {
+						$('.main__status').html(
+						    "<span class='rus_lang'><strong>{{ bot_stop_ru }}</strong></span><span class='en_lang'><strong>{{ bot_stop_en }}</strong></span>"
+
+						);
                         sleep(10000).then(() => {
 							getAccount()
 						});
