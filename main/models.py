@@ -107,7 +107,8 @@ class Order(models.Model):
         ('Gift Received', 'Gift Received'),
         ('Gift Sent', 'Gift Sent'),
         ('Accept Request', 'Accept Request'),
-        ('Bot Wait', 'Bot Wait')
+        ('Bot Wait', 'Bot Wait'),
+        ('Bot Stop', 'Bot Stop')
     )
 
     sell_code = models.TextField(
@@ -176,6 +177,9 @@ class Order(models.Model):
                 self.check_count = 0
                 check_friends_list(self.bot.steam_login, self.sell_code, self.bot.link,  self.user_link,
                                    "Check Friend List", schedule=120)
+            elif self.status == 'Bot Wait':
+                self.check_count = 0
+                check_bots(self.sell_code, "Bot Wait", schedule=120)
             super().save(*args, **kwargs)
 
         elif self.tracker.has_changed('status') and len(Task.objects.filter(task_params__contains=self.sell_code)) != 0\
@@ -195,6 +199,19 @@ def send_message(message, token, users):
         except Exception as e:
             print(e)
 
+
+@background(schedule=20)
+def check_bots(order_id, task_name):
+    print(task_name)
+    order = get_order_by_sell_code(order_id)
+    account = get_user_by_country('Россия', order.game.price)
+    if account != 0:
+        order.account = account,
+        order.status = "Add to Friends"
+        order.save()
+        check_friends_list_first(account.steam_login, order_id, account.link, order.user_link, "First Check")
+    else:
+        check_bots(order_id, task_name)
 
 @background
 def add_friend(login, target_link, order_id, task_name):
@@ -222,9 +239,8 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
     order = get_order_by_sell_code(order_code)
     order.check_count += 1
     order.save()
-    print(order.check_count)
     print('!!!!!!!!!!!!!!!!!!!!!')
-    if order.check_count < 6:
+    if order.check_count < 3:
         result = get_friends.check_friends(bot_link, user_link)
         if result:
             print("Бот в друзьях")
@@ -233,17 +249,7 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
             order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, task_name)
-    elif order.check_count < 12:
-        result = get_friends.check_friends(bot_link, user_link)
-        if result:
-            print("Бот в друзьях")
-            order.status = 'Sending Gift'
-            order.check_count = 0
-            order.save()
-            send_gift_to_user(bot_login, order_code, 'Send Gift')
-        else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=300)
+            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=60)
     elif order.check_count < 20:
         result = get_friends.check_friends(bot_link, user_link)
         if result:
@@ -253,8 +259,10 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
             order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=600)
+            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=180)
     else:
+        order.status = "Bot Stop"
+        order.save()
         print('Проверок больше не будет')
 
 
@@ -484,8 +492,22 @@ def get_user_by_login(login: str) -> Account:
     return Account.objects.filter(steam_login=login)[0]
 
 
-def get_user_by_country(country: str) -> Account:
-    return Account.objects.filter(country=country)[0]
+def get_user_by_country(country: str, price: str):
+    print(price)
+    account_list = list(Account.objects.filter(country=country, balance__gt=float(price)))
+    print(len(account_list))
+    if len(account_list) == 0:
+        message = f"""Недостаточно средств в регионе {country}!
+Нет не одного аккаунта с балансом больше {price}. Последний гифт не отправлен!"""
+        token = get_telegram_token('info').key
+        users = get_telegram_users()
+
+        send_message(message, token, users)
+        return random.choice(list(Account.objects.filter(country=country)))
+    for account in account_list:
+        if len(Task.objects.filter(task_params__contains=account.steam_login)) == 0:
+            return account
+    return 0
 
 
 def get_user_by_id(number: str) -> Account:
