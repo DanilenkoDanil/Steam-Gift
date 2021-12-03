@@ -312,8 +312,7 @@ def index(request):
                 print('!!!!!!!!!!!!!!!!!!!!!!')
                 if game.priority_list != '' and game.priority_list is not None:
                     country = info['options'][1]['value']
-                    bot_account_code = random.choice(priority_list.get_list(game.priority_list))
-                    account = get_user_by_id(bot_account_code)
+                    account = get_user_by_list(priority_list.get_list(game.priority_list))
                 else:
                     country = info['options'][1]['value']
                     account = get_user_by_country(country, game.price)
