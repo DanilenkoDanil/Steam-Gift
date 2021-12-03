@@ -243,6 +243,14 @@ def get_user_by_id(number: str) -> Account:
     return Account.objects.filter(id=number)[0]
 
 
+def get_user_by_list(priori_list: str) -> Account:
+    for i in priori_list:
+        account = get_user_by_id(i)
+        if len(Task.objects.filter(task_params__contains=account.steam_login)) == 0:
+            return account
+    return 0
+
+
 def get_game(product_code: str) -> Game:
     return Game.objects.filter(sell_code=product_code)[0]
 
@@ -318,7 +326,6 @@ def index(request):
                     order = Order(sell_code=code, bot=account, game=game, user_link=user_link, status='Add to Friends',
                                   country=country, skype_link=i.skype_link, shop_link=i.shop_link, check_count=0)
                     order.save()
-
                     check_friends_list_first(account.steam_login, code, account.link, user_link, 'First Check')
                 else:
                     account = get_user_by_login('.')
@@ -333,9 +340,8 @@ def index(request):
 
                 token = get_telegram_token('info').key
                 users = get_telegram_users()
-                
-                # Временно отключено
-                # send_message(message, token, users)
+
+                send_message(message, token, users)
 
                 return render(request, 'main/account.html',
                               {'game_name': game.name,
