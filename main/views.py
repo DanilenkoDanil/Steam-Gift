@@ -163,7 +163,8 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
             order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, task_name, schedule=180)
+            check_friends_list(bot_login, order_code, bot_link, user_link, f'Check Friends {order.check_count}', 
+                               schedule=180)
     else:
         order.status = "Bot Stop"
         order.save()
