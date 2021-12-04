@@ -74,7 +74,7 @@ def check_gift_status(login, target_name, order_id, task_name):
         if status == 'Submitted':
             order.status = 'Gift Sent'
             order.save()
-            check_gift_status(login, target_name, order_id, task_name, schedule=1200)
+            check_gift_status(login, target_name, order_id, task_name, schedule=60)
         elif status == 'Received':
             order.status = 'Gift Received'
             order.save()
@@ -105,6 +105,8 @@ def check_gift_status(login, target_name, order_id, task_name):
             order.save()
     else:
         print('Слишком много проверок, статус больше не обновляеться')
+        order.status = 'Gift Received'
+        order.save()
 
 
 @background
@@ -163,7 +165,7 @@ def check_friends_list(bot_login, order_code, bot_link, user_link, task_name):
             order.save()
             send_gift_to_user(bot_login, order_code, 'Send Gift')
         else:
-            check_friends_list(bot_login, order_code, bot_link, user_link, f'Check Friends {order.check_count}', 
+            check_friends_list(bot_login, order_code, bot_link, user_link, f'Check Friends {order.check_count}',
                                schedule=180)
     else:
         order.status = "Bot Stop"
