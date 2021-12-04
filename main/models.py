@@ -306,7 +306,7 @@ def check_gift_status(login, target_name, order_id, task_name):
         if status == 'Submitted':
             order.status = 'Gift Sent'
             order.save()
-            check_gift_status(login, target_name, order_id, task_name, schedule=1200)
+            check_gift_status(login, target_name, order_id, task_name, schedule=60)
         elif status == 'Received':
             order.status = 'Gift Received'
             order.save()
@@ -337,6 +337,8 @@ def check_gift_status(login, target_name, order_id, task_name):
             order.save()
     else:
         print('Слишком много проверок, статус больше не обновляеться')
+        order.status = 'Gift Received'
+        order.save()
 
 
 @background(schedule=2)
@@ -506,6 +508,7 @@ def get_user_by_country(country: str, price: str):
         return random.choice(list(Account.objects.filter(country=country)))
     for account in account_list:
         if len(Task.objects.filter(task_params__contains=account.steam_login)) == 0:
+            print('Yes - Go')
             return account
     return 0
 
