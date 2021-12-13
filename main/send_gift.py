@@ -62,7 +62,33 @@ def add_friend(driver, link: str):
     time.sleep(2)
     driver.find_element_by_xpath('//*[@id="btn_add_friend"]/span').click()
     time.sleep(1)
-    driver.find_element_by_xpath('/html/body/div[3]/div[3]/div/div[2]/div/span').click()
+    result = str(driver.page_source)
+    print('Добавлен в друзья')
+    # На случай сбоя в стиме. Нужно добавить юзера в черный список и обратно, чтобы попробовать ещё раз
+    if 'отправлен' not in result.lower() and 'sent' not in result.lower():
+        print("Попытка номер 2")
+        driver.get(link)
+        time.sleep(2)
+        driver.find_element_by_xpath('//*[@id="profile_action_dropdown_link"]/span').click()
+        time.sleep(0.5)
+        driver.find_element_by_xpath('//*[@id="profile_action_dropdown"]/div[9]/a[1]').click()
+        time.sleep(0.5)
+        driver.find_element_by_xpath('/html/body/div[3]/div[3]/div/div[2]/div[1]/span').click()
+        time.sleep(0.2)
+        driver.get(link)
+        time.sleep(2)
+        driver.find_element_by_xpath('//*[@id="profile_action_dropdown_link"]/span').click()
+        time.sleep(0.5)
+        driver.find_element_by_xpath('//*[@id="profile_action_dropdown"]/div[9]/a[2]').click()
+        time.sleep(0.2)
+        driver.find_element_by_xpath('/html/body/div[3]/div[3]/div/div[2]/div[1]/span').click()
+        driver.get(link)
+        time.sleep(2)
+        driver.find_element_by_xpath('//*[@id="btn_add_friend"]/span').click()
+        time.sleep(0.5)
+        result = str(driver.page_source)
+        if 'отправлен' in result.lower() or 'sent' in result.lower():
+            print('Успех')
 
 
 def remove_friend(driver, link: str):
