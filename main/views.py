@@ -37,7 +37,7 @@ def check_bots(order_id, task_name):
     order = get_order_by_sell_code(order_id)
     account = get_user_by_country('Россия', order.game.price)
     if account != 0:
-        order.account = account,
+        order.bot = account
         order.status = "Add to Friends"
         order.save()
         check_friends_list_first(account.steam_login, order_id, account.link, order.user_link, "First Check")
