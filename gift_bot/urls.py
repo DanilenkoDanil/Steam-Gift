@@ -22,4 +22,4 @@ urlpatterns = [
     path('', include('main.urls'))
 ]
 
-# admin.site.__class__ = OTPAdminSite
+admin.site.__class__ = OTPAdminSite
