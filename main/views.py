@@ -37,6 +37,9 @@ def check_bots(order_id, task_name):
     order = get_order_by_sell_code(order_id)
     account = get_user_by_country('Россия', order.game.price)
     if account != 0:
+        print('!!!!!!!!')
+        print(type(account))
+        print(type(order.bot))
         order.bot = account
         order.status = "Add to Friends"
         order.save()
@@ -51,7 +54,8 @@ def add_friend(login, target_link, order_id, task_name):
     order = get_order_by_sell_code(order_id)
     bot = get_user_by_login(login)
 
-    if send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_link) != 'Error':
+    if send_gift.main_friend_add(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_link) \
+            != 'Error':
         order.status = 'Accept Request'
         order.save()
         check_friends_list(login, order_id, bot.link, target_link, 'Check friends')
@@ -70,7 +74,8 @@ def check_gift_status(login, target_name, order_id, task_name):
     game_name = order.game.name
 
     if order.check_count < 6:
-        status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy, target_name, game_name)
+        status = send_gift.check_gift_status(bot.steam_login, bot.steam_password, bot.shared_secret, bot.proxy,
+                                             target_name, game_name)
         if status == 'Submitted':
             order.status = 'Gift Sent'
             order.save()
@@ -116,7 +121,8 @@ def send_gift_to_user(login, order_code, task_name):
     order = get_order_by_sell_code(order_code)
     target_name = get_name.get_name(order.user_link)
     game_link = f'https://store.steampowered.com/app/{order.game.app_code}'
-    result = send_gift.main(bot.steam_login, bot.steam_password, bot.shared_secret, target_name, game_link, order.game.sub_id, bot.proxy, order.user_link)
+    result = send_gift.main(bot.steam_login, bot.steam_password, bot.shared_secret, target_name, game_link,
+                            order.game.sub_id, bot.proxy, order.user_link)
     if result is None or result == "Error Remove":
         order.status = 'Gift Sent'
         order.save()
