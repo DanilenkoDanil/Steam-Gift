@@ -38,6 +38,7 @@ class GameForm(forms.ModelForm):
     class Meta:
         model = Game
         fields = (
+            'name',
             'sell_code',
             'app_code',
             'description_ru',
