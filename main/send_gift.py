@@ -116,7 +116,7 @@ def gift_game(driver, game_link, sub_id, friend_name):
         pass
     # Добавить в корзину
 
-    driver.find_element_by_xpath(f"//*[contains(@href,'{sub_id}')]").click()
+    driver.find_element_by_xpath(f"//*[contains(@href,'{sub_id});')]").click()
 
     time.sleep(1)
     # Купить в подарок
